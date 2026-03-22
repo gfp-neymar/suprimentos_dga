@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DGA — Suprimentos/Materiais</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root {
   --red:#D0253A; --red2:#a81d2d; --dark:#2B2B2B;
@@ -305,34 +306,31 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
     </div>
     </div>
 </div>
-<!-- Tela de seleção de comprador -->
+<!-- Tela de login Google -->
 <div id="tela-login" style="
   position:fixed;inset:0;z-index:9999;
-  background:var(--bg);
+  background:#f5f5f5;
   display:none;align-items:center;justify-content:center;
 ">
   <div style="
-    background:var(--card);border:1px solid var(--border);
-    border-radius:16px;padding:40px;max-width:420px;width:90%;
+    background:#fff;border:1px solid #e0e0e0;
+    border-radius:16px;padding:40px 36px;max-width:400px;width:90%;
     box-shadow:0 8px 32px rgba(0,0,0,.12);text-align:center;
   ">
-    <div style="font-size:40px;margin-bottom:12px;">👤</div>
-    <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px;">DGA / Suprimentos</div>
-    <div style="font-size:13px;color:var(--gray4);margin-bottom:28px;">Selecione seu nome para continuar</div>
-    <select id="login-select" style="
-      width:100%;padding:10px 14px;font-size:14px;
-      border:1px solid var(--border);border-radius:8px;
-      background:var(--bg);color:var(--text);margin-bottom:20px;
-    ">
-      <option value="">Selecione...</option>
-    </select>
-    <button onclick="confirmarLogin()" style="
-      width:100%;padding:12px;font-size:14px;font-weight:700;
-      background:var(--red);color:#fff;border:none;border-radius:8px;cursor:pointer;
-    ">Entrar</button>
-    <div id="login-erro" style="color:var(--red);font-size:12px;margin-top:10px;display:none;">
-      Selecione um comprador para continuar.
+    <div style="font-size:36px;margin-bottom:12px;">🏛️</div>
+    <div style="font-size:18px;font-weight:700;color:#2B2B2B;margin-bottom:4px;">DGA / Suprimentos</div>
+    <div style="font-size:13px;color:#888;margin-bottom:8px;">Sistema de Gestão de Processos</div>
+    <div style="font-size:11px;color:#bbb;margin-bottom:32px;font-family:monospace;">
+      Utilize seu e-mail institucional @unicamp.br
     </div>
+    <div id="google-btn-wrapper" style="display:flex;justify-content:center;margin-bottom:16px;"></div>
+    <div id="login-loading" style="display:none;font-size:13px;color:#888;margin:12px 0;">
+      ⏳ Verificando credenciais…
+    </div>
+    <div id="login-erro" style="
+      color:#D0253A;font-size:12px;margin-top:10px;
+      display:none;padding:10px;background:#fdecea;border-radius:8px;
+    "></div>
   </div>
 </div>
 <!-- DASHBOARD -->
@@ -789,14 +787,14 @@ function fecharSplash() {
   if (el) { el.classList.add('fade-out'); setTimeout(() => el.remove(), 800); }
 }
 // ══════════ LOGIN ══════════
+const GOOGLE_CLIENT_ID = '962659151331-n7a1gn75hccchmh3gokthr18o9b8l6mu.apps.googleusercontent.com';
 let compradorAtivo = null;
 
+// ── Avatar / menu ──
 function toggleAvatarMenu() {
   const menu = document.getElementById('avatar-menu');
   menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
 }
-
-// Fecha o menu ao clicar fora
 document.addEventListener('click', function(e) {
   const btn  = document.getElementById('avatar-btn');
   const menu = document.getElementById('avatar-menu');
@@ -805,36 +803,88 @@ document.addEventListener('click', function(e) {
   }
 });
 
-async function trocarComprador() {
-  document.getElementById('avatar-menu').style.display = 'none';
-  compradorAtivo = null;
-  localStorage.removeItem('dga_comprador');
-  document.getElementById('vDash').style.display = 'none';
-
-  // Limpa e recarrega o select
-  const sel = document.getElementById('login-select');
-  sel.innerHTML = '<option value="">Selecione...</option>';
-  try {
-    const r = await gasCall('listarCompradores', {});
-    (r.lista || []).forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = JSON.stringify(c);
-      opt.textContent = c.nome;
-      sel.appendChild(opt);
-    });
-  } catch(e) {
-    console.error('Erro ao carregar compradores:', e);
-  }
-
-  document.getElementById('tela-login').style.display = 'flex';
+function atualizarAvatar() {
+  if (!compradorAtivo) return;
+  const inicial = (compradorAtivo.nome || '?')[0].toUpperCase();
+  document.getElementById('avatar-btn').textContent = inicial;
+  document.getElementById('avatar-nome').textContent = compradorAtivo.nome;
 }
 
+// ── Logout / trocar conta ──
 function logout() {
-  localStorage.removeItem('dga_comprador');
+  localStorage.removeItem('dga_usuario');
   compradorAtivo = null;
+  if (window.google && google.accounts && google.accounts.id) {
+    google.accounts.id.disableAutoSelect();
+  }
   location.reload();
 }
 
+function trocarComprador() {
+  document.getElementById('avatar-menu').style.display = 'none';
+  logout();
+}
+
+// ── Inicialização do botão Google ──
+function inicializarGoogleSignIn() {
+  if (!window.google || !google.accounts) {
+    setTimeout(inicializarGoogleSignIn, 300);
+    return;
+  }
+  google.accounts.id.initialize({
+    client_id:             GOOGLE_CLIENT_ID,
+    callback:              handleCredentialResponse,
+    auto_select:           false,
+    cancel_on_tap_outside: false
+  });
+  google.accounts.id.renderButton(
+    document.getElementById('google-btn-wrapper'),
+    { theme: 'outline', size: 'large', text: 'signin_with', locale: 'pt-BR', width: 280 }
+  );
+}
+
+// ── Callback após autenticação Google ──
+async function handleCredentialResponse(response) {
+  document.getElementById('login-loading').style.display = '';
+  document.getElementById('login-erro').style.display    = 'none';
+  try {
+    const r = await gasCall('autenticar', { idToken: response.credential });
+    compradorAtivo = { nome: r.nome, email: r.email, perfil: r.perfil, pastaId: r.pastaId };
+    localStorage.setItem('dga_usuario', JSON.stringify(compradorAtivo));
+    document.getElementById('tela-login').style.display = 'none';
+    document.getElementById('vDash').style.display      = '';
+    atualizarAvatar();
+    mostrarLoading('Carregando processos…');
+    await carregarDoSheets();
+    ocultarLoading();
+    sheetsPronto = true;
+    tentarFecharSplash();
+  } catch(e) {
+    document.getElementById('login-loading').style.display = 'none';
+    const erroEl = document.getElementById('login-erro');
+    erroEl.textContent = e.message || 'Erro ao autenticar. Tente novamente.';
+    erroEl.style.display = '';
+  }
+}
+
+// ── Verificar sessão salva ou exibir login ──
+async function iniciarLogin() {
+  const salvo = localStorage.getItem('dga_usuario');
+  if (salvo) {
+    try {
+      compradorAtivo = JSON.parse(salvo);
+      document.getElementById('tela-login').style.display = 'none';
+      document.getElementById('vDash').style.display      = '';
+      atualizarAvatar();
+      return true;
+    } catch(e) {
+      localStorage.removeItem('dga_usuario');
+    }
+  }
+  document.getElementById('tela-login').style.display = 'flex';
+  inicializarGoogleSignIn();
+  return false;
+}
 function atualizarAvatar() {
   if (!compradorAtivo) return;
   const inicial = (compradorAtivo.nome || '?')[0].toUpperCase();
