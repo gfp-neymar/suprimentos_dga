@@ -626,7 +626,11 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
       <div class="mfsec">✏️ Preencher</div>
       <div class="row2">
         <div class="fe"><label>Nº Pregão <span class="req">*</span> <span id="m148-preg-badge"></span></label><input id="m148-npreg" placeholder="Ex: 90088/2026"/></div>
-        <div class="fe"><label>Data de Publicação <span class="req">*</span> <span id="m148-pub-badge"></span></label><input id="m148-dpub" type="date" onchange="validarDatas148()"/></div>
+        <div class="fe">
+          <label>Data de Publicação <span class="req">*</span> <span id="m148-pub-badge"></span></label>
+          <input id="m148-dpub" type="date" onchange="validarDatas148()"/>
+          <span class="hint" id="m148-pub-hint" style="color:var(--gray4);"></span>
+        </div>
       </div>
       <div class="fe">
         <label>Data do Pregão <span class="req">*</span> <span id="m148-data-badge"></span></label>
@@ -1778,6 +1782,13 @@ function isFeriadoDGA(d) {
   return FERIADOS_DGA.has(iso);
 }
 
+function isDiaUtilDGA(d) {
+  const diaSem = d.getDay();
+  if (diaSem === 0 || diaSem === 6) return false;
+  if (isFeriadoDGA(d)) return false;
+  return true;
+}
+
 function diasUteis(inicio, dias) {
   let d = new Date(inicio), contados = 0;
   while (contados < dias) {
@@ -1791,7 +1802,23 @@ function validarDatas148() {
   const dpubVal  = document.getElementById('m148-dpub').value;
   const dpregVal = document.getElementById('m148-dpreg').value;
   const hint     = document.getElementById('m148-data-hint');
+  const hintPub  = document.getElementById('m148-pub-hint');
   const btnGerar = document.querySelector('#ov-148 .bgerar');
+
+  // Valida data de publicação
+  if (dpubVal) {
+    const dPub = new Date(dpubVal + 'T12:00:00');
+    if (!isDiaUtilDGA(dPub)) {
+      if (hintPub) { hintPub.textContent = '⚠ Data inválida — sábados, domingos e feriados DGA não são permitidos'; hintPub.style.color = 'var(--red)'; }
+      hint.textContent = 'Corrija a Data de Publicação primeiro';
+      hint.style.color = 'var(--red)';
+      if (btnGerar) btnGerar.disabled = true;
+      return;
+    } else {
+      if (hintPub) { hintPub.textContent = ''; }
+    }
+  }
+
   if (!dpubVal) {
     hint.textContent = 'Mínimo 8 dias úteis após a publicação';
     hint.style.color = 'var(--gray4)';
@@ -1799,25 +1826,37 @@ function validarDatas148() {
     if (btnGerar) btnGerar.disabled = false;
     return;
   }
+
   const minDate = diasUteis(dpubVal, 8);
   const minStr  = minDate.toISOString().split('T')[0];
   document.getElementById('m148-dpreg').min = minStr;
-  const dd = minDate.getDate().toString().padStart(2,'0');
-  const mm = (minDate.getMonth()+1).toString().padStart(2,'0');
+  const dd   = minDate.getDate().toString().padStart(2,'0');
+  const mm   = (minDate.getMonth()+1).toString().padStart(2,'0');
   const yyyy = minDate.getFullYear();
+
   if (!dpregVal) {
     hint.textContent = 'Data mínima: ' + dd + '/' + mm + '/' + yyyy + ' (8 dias úteis após publicação)';
     hint.style.color = 'var(--orange)';
     if (btnGerar) btnGerar.disabled = false;
     return;
   }
+
+  // Valida data do pregão
+  const dPreg = new Date(dpregVal + 'T12:00:00');
+  if (!isDiaUtilDGA(dPreg)) {
+    hint.textContent = '⚠ Data inválida — sábados, domingos e feriados DGA não são permitidos';
+    hint.style.color = 'var(--red)';
+    if (btnGerar) btnGerar.disabled = true;
+    return;
+  }
+
   if (dpregVal < minStr) {
     hint.textContent = '⚠ Data inválida — mínimo ' + dd + '/' + mm + '/' + yyyy + ' (8 dias úteis)';
     hint.style.color = 'var(--red)';
     if (btnGerar) btnGerar.disabled = true;
   } else {
-    let contDU = 0, cur = new Date(dpubVal), fim = new Date(dpregVal);
-    while (cur < fim) { cur.setDate(cur.getDate() + 1); if (cur.getDay() !== 0 && cur.getDay() !== 6) contDU++; }
+    let contDU = 0, cur = new Date(dpubVal + 'T12:00:00'), fim = new Date(dpregVal + 'T12:00:00');
+    while (cur < fim) { cur.setDate(cur.getDate() + 1); if (isDiaUtilDGA(cur)) contDU++; }
     hint.textContent = '✓ ' + contDU + ' dias úteis de intervalo — prazo legal atendido';
     hint.style.color = 'var(--green)';
     if (btnGerar) btnGerar.disabled = false;
