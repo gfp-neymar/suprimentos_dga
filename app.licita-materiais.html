@@ -415,6 +415,18 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
       <!-- ETAPA 1: Identificação + Fase -->
       <div class="wz-painel v" id="ea-p1">
         <div class="mfsec">Etapa 1 de 3 — Identificação</div>
+
+        <!-- ── Importar TR Técnico ── -->
+        <div style="background:#e8f4fd;border:1px solid #bbdefb;border-radius:9px;padding:12px 14px;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;color:#1565c0;margin-bottom:4px;">📄 Tem o TR Técnico em PDF?</div>
+          <div style="font-size:11px;color:#4b5563;margin-bottom:8px;font-family:monospace;">Importe para preencher objeto e itens automaticamente</div>
+          <button class="abtn util" style="width:100%;justify-content:center;padding:10px;" onclick="abrirLeituraTR('andamento')" id="btn-ler-tr-andamento">
+            <span class="bico">📄</span>
+            <span class="btxt"><span class="blabel">Selecionar PDF do TR Técnico</span></span>
+          </button>
+          <div id="tr-preview-andamento" style="display:none;"></div>
+        </div>
+
         <div class="fe">
           <label>Fase atual do processo <span class="req">*</span></label>
           <select id="ea-fase">
@@ -433,6 +445,7 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
         </div>
         <div class="fe"><label>Interessado / Unidade <span class="req">*</span></label><input id="ea-int" placeholder="Ex: Hospital da Mulher / CAISM"/></div>
         <div class="fe"><label>Objeto / Assunto <span class="req">*</span></label><textarea id="ea-obj" placeholder="Ex: Registro de Preços de Eletrodo Descartável"></textarea></div>
+
         <!-- Opção de pasta -->
         <div class="fe">
           <label>Pasta do processo <span class="req">*</span></label>
@@ -506,6 +519,7 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
     </div>
   </div>
 </div>
+
 <!-- Novo Processo -->
 <div class="overlay" id="ov-novo" onclick="fecharOv('ov-novo',event)">
   <div class="modal" onclick="event.stopPropagation()">
@@ -515,6 +529,18 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
       <div class="mproc">Os dados serão preenchidos no Checklist automaticamente</div>
     </div>
     <div class="mbody">
+
+      <!-- ── Importar TR Técnico ── -->
+      <div style="background:#e8f4fd;border:1px solid #bbdefb;border-radius:9px;padding:12px 14px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:#1565c0;margin-bottom:4px;">📄 Tem o TR Técnico em PDF?</div>
+        <div style="font-size:11px;color:#4b5563;margin-bottom:8px;font-family:monospace;">Importe e os campos serão preenchidos automaticamente</div>
+        <button class="abtn util" style="width:100%;justify-content:center;padding:10px;" onclick="abrirLeituraTR('novo')" id="btn-ler-tr-novo">
+          <span class="bico">📄</span>
+          <span class="btxt"><span class="blabel">Selecionar PDF do TR Técnico</span></span>
+        </button>
+        <div id="tr-preview-novo" style="display:none;"></div>
+      </div>
+
       <div class="mfsec">Identificação</div>
       <div class="fe"><label>Número do Processo <span class="req">*</span></label><input id="n-proc" placeholder="Ex: 01-P-2646/2026"/></div>
       <div class="fe">
@@ -537,7 +563,6 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
     </div>
   </div>
 </div>
-
 <!-- Modal 14.2 -->
 <div class="overlay" id="ov-142" onclick="fecharOv('ov-142',event)">
   <div class="modal" onclick="event.stopPropagation()">
@@ -552,6 +577,7 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
       <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m142-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
       <div class="fro"><span class="fri">✓</span><div><div class="frl">Comprador</div><div class="frv" id="m142-r-comp">—</div><div class="frs">← Tabela 1</div></div></div>
       <div class="mfsec">✏️ Preencher — será salvo no Checklist</div>
+      <div class="fe"><label>Nº Pregão <span class="req">*</span> <span class="newbadge">NOVO</span></label><input id="m142-npreg" placeholder="Ex: 90088/2026"/><span class="hint">Será usado neste documento e salvo para o Aviso de Abertura</span></div>
       <div class="row2">
         <div class="fe"><label>Parecer PG <span class="req">*</span> <span class="newbadge">NOVO</span></label><input id="m142-parecer" placeholder="Ex: 475/2026"/><span class="hint">Número do Parecer PG</span></div>
         <div class="fe"><label>Despacho PG <span class="req">*</span> <span class="newbadge">NOVO</span></label><input id="m142-despacho" placeholder="Ex: 826/2026"/><span class="hint">Número do Despacho PG</span></div>
@@ -623,9 +649,10 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
       <div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="m148-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
       <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m148-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
       <div class="fro"><span class="fri">✓</span><div><div class="frl">Pregoeiro</div><div class="frv" id="m148-r-preg">—</div><div class="frs">← Tabela 10</div></div></div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Nº Pregão</div><div class="frv" id="m148-r-npreg">—</div><div class="frs">← Salvo na etapa 14.2</div></div></div>
       <div class="mfsec">✏️ Preencher</div>
       <div class="row2">
-        <div class="fe"><label>Nº Pregão <span class="req">*</span> <span id="m148-preg-badge"></span></label><input id="m148-npreg" placeholder="Ex: 90088/2026"/></div>
+        <div class="fe" style="display:none;"><label>Nº Pregão</label><input id="m148-npreg"/></div>
         <div class="fe">
           <label>Data de Publicação <span class="req">*</span> <span id="m148-pub-badge"></span></label>
           <input id="m148-dpub" type="date" onchange="validarDatas148()"/>
@@ -772,19 +799,9 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
           </div>
         </div>
         <div id="pp-bloco-limite" style="display:none;margin-top:8px;">
-          <div class="mfsec">Refinar quantidade</div>
-          <div class="fe">
-            <label>Limitar resultados por CATMAT</label>
-            <select id="pp-limite">
-              <option value="0">Sem limite (todos os resultados)</option>
-              <option value="5">5 mais recentes</option>
-              <option value="10">10 mais recentes</option>
-              <option value="15">15 mais recentes</option>
-              <option value="20">20 mais recentes</option>
-            </select>
-            <span class="hint">Os resultados são ordenados do mais recente para o mais antigo.</span>
-          </div>
-          <button class="bgerar" style="margin-top:8px;width:100%;justify-content:center;" onclick="previewPP()">🔄 Reaplicar filtro</button>
+          <div class="mfsec">Refinar quantidade por CATMAT</div>
+          <div id="pp-limites-por-catmat"></div>
+          <button class="bgerar" style="margin-top:8px;width:100%;justify-content:center;" onclick="reaplicarFiltrosPP()">🔄 Reaplicar filtros</button>
         </div>
       </div>
 
@@ -1293,6 +1310,14 @@ async function criarProcesso() {
   console.log('criarPasta payload:', { numProc, resumo: res, comprador: comp, interessado: inter, assunto: obj, compradorFolderId, tipo });
   try {
     await gasCall('criarPasta', { numProc, resumo: res, comprador: comp, interessado: inter, assunto: obj, compradorFolderId, tipo });
+
+    // Salva itens do TR Técnico, se foram importados antes de criar o processo
+    if (_trDadosExtraidos && _trDadosExtraidos.itens && _trDadosExtraidos.itens.length > 0) {
+      mostrarLoading('Salvando ' + _trDadosExtraidos.itens.length + ' itens do TR…');
+      await gasCall('salvarItens', { numProc, itens: _trDadosExtraidos.itens });
+      _trDadosExtraidos = null; // limpa para não reutilizar em outro processo
+    }
+
     ocultarLoading();
     await carregarDoSheets();
     setTimeout(() => {
@@ -1675,10 +1700,15 @@ async function criarProcessoEmAndamento() {
         pastaId
       });
     }
-    // Salva os itens se houver
+    // Salva os itens: prioriza eaItens (adicionados manualmente ou via TR na etapa 2)
+    // Fallback: usa _trDadosExtraidos caso o TR tenha sido importado mas eaItens esteja vazio
     if (eaItens.length > 0) {
       await gasCall('salvarItens', { numProc, itens: eaItens.map(mapItem) });
+    } else if (_trDadosExtraidos && _trDadosExtraidos.itens && _trDadosExtraidos.itens.length > 0) {
+      mostrarLoading('Salvando ' + _trDadosExtraidos.itens.length + ' itens do TR…');
+      await gasCall('salvarItens', { numProc, itens: _trDadosExtraidos.itens });
     }
+    _trDadosExtraidos = null;
 
     // Se for Homologação, salva dados do pregão
     if (fase === 'HOMOLOGACAO') {
@@ -1732,7 +1762,8 @@ function abrirModal148() {
   document.getElementById('m148-proc').textContent  = p.PROCESSO + ' · ' + p.INTERESSADO;
   document.getElementById('m148-r-proc').textContent = p.PROCESSO;
   document.getElementById('m148-r-obj').textContent  = p.ASSUNTO;
-  document.getElementById('m148-r-preg').textContent = p.PREGOEIRO || '(não preenchido ainda)';
+  document.getElementById('m148-r-preg').textContent  = p.PREGOEIRO || '(não preenchido ainda)';
+  document.getElementById('m148-r-npreg').textContent = p.N_PREGAO  || '(preencha na etapa 14.2)';
   document.getElementById('m148-npreg').value = p.N_PREGAO || '';
   document.getElementById('m148-dpreg').value = isoDate(p.DATA_PREGAO);
   document.getElementById('m148-dpub').value  = isoDate(p.DATA_PUBLICACAO);
@@ -2182,14 +2213,15 @@ function abrirModal172() {
 
 // ══════════ GERAR DOCUMENTOS ══════════
 async function gerar142() {
-  const par = v('m142-parecer'), des = v('m142-despacho');
-  if (!par || !des) { alert('Preencha o Parecer PG e o Despacho PG.'); return; }
+  const par = v('m142-parecer'), des = v('m142-despacho'), np = v('m142-npreg');
+  if (!par || !des || !np) { alert('Preencha o Parecer PG, o Despacho PG e o Nº do Pregão.'); return; }
   fecharOv('ov-142');
   mostrarLoading('Gerando 14.2 Informação Instaurar Sessão…');
   try {
-    const r = await gasCall('gerarInfoSessao', { numProc: dg().PROCESSO, n_parecer_pg: par, n_despacho_pg: des, doc_sigad: v('m142-sigad') });
+    const r = await gasCall('gerarInfoSessao', { numProc: dg().PROCESSO, n_parecer_pg: par, n_despacho_pg: des, num_pregao: np, doc_sigad: v('m142-sigad') });
     procAtual.dadosGerais.N_PARECER_PG  = par;
     procAtual.dadosGerais.N_DESPACHO_PG = des;
+    procAtual.dadosGerais.N_PREGAO      = np;
     registrarDoc('14.2 Informação Instaurar Sessão');
     renderSidebar();
     toast('📄', '14.2 gerada!', 'Parecer ' + par + ' · Despacho ' + des, true);
@@ -2323,16 +2355,15 @@ let ppItensPreview = [];
 
 async function previewPP() {
   if (!procAtual.itens.length) { alert('Adicione pelo menos um item.'); return; }
-  const limite = parseInt(document.getElementById('pp-limite').value) || 0;
-  const btn    = document.getElementById('pp-btn-acao');
+  const btn = document.getElementById('pp-btn-acao');
   setLoading(btn, true, '⏳ Buscando…');
   try {
     await gasCall('salvarItens', { numProc: dg().PROCESSO, itens: procAtual.itens.map(mapItem) });
-    const r = await gasCall('previewPesquisaPrecos', { numProc: dg().PROCESSO, limite });
+    const r = await gasCall('previewPesquisaPrecos', { numProc: dg().PROCESSO, limite: 0 });
     console.log('previewPP resposta:', JSON.stringify(r));
     ppItensPreview = r.itens || [];
-
-    // Monta resumo
+    window._ppUltimoResumo = r.resumo || [];
+        // Monta resumo
     let resumoHtml = '<div class="mfsec">Resultado da busca</div>';
     (r.resumo || []).forEach(function(res) {
       const cor = res.total === 0 ? 'var(--red)' : 'var(--green)';
@@ -2360,6 +2391,25 @@ async function previewPP() {
     document.getElementById('pp-preview-resumo').innerHTML = resumoHtml;
     document.getElementById('pp-preview-aviso-zero').style.display = r.total === 0 ? '' : 'none';
     document.getElementById('pp-bloco-limite').style.display        = r.total > 0  ? '' : 'none';
+
+    if (r.total > 0) {
+      let limitesHtml = '';
+      (r.resumo || []).forEach(function(res) {
+        limitesHtml += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 12px;
+          border-radius:7px;background:var(--gray1);border:1px solid var(--border);">
+          <span style="font-family:monospace;font-weight:700;font-size:12px;flex:1;">CATMAT ${res.catmat}</span>
+          <select id="pp-limite-${res.catmat}" style="width:180px;padding:6px 8px;border:1px solid var(--border);
+            border-radius:6px;font-size:12px;font-family:inherit;">
+            <option value="0">Todos (${res.total})</option>
+            <option value="5">5 mais recentes</option>
+            <option value="10">10 mais recentes</option>
+            <option value="15">15 mais recentes</option>
+            <option value="20">20 mais recentes</option>
+          </select>
+        </div>`;
+      });
+      document.getElementById('pp-limites-por-catmat').innerHTML = limitesHtml;
+    }
     document.getElementById('pp-passo1').style.display = 'none';
     document.getElementById('pp-passo2').style.display = '';
     document.getElementById('pp-mhint').textContent    = r.total + ' resultado(s) encontrado(s)';
@@ -2390,6 +2440,54 @@ function voltarConfigPP() {
   const btnCancelar = document.getElementById('pp-btn-cancelar');
   btnCancelar.textContent = 'Cancelar';
   btnCancelar.onclick     = () => fecharOv('ov-pp');
+}
+
+function getLimitesPorCatmat(resumo) {
+  const limites = {};
+  (resumo || []).forEach(function(res) {
+    const el = document.getElementById('pp-limite-' + res.catmat);
+    limites[res.catmat] = el ? (parseInt(el.value) || 0) : 0;
+  });
+  return limites;
+}
+
+async function reaplicarFiltrosPP() {
+  const resumoAtual = window._ppUltimoResumo || [];
+  if (!resumoAtual.length) return;
+  const limites = getLimitesPorCatmat(resumoAtual);
+  mostrarLoading('Reaplicando filtros…');
+  try {
+    const r = await gasCall('previewPesquisaPrecos', { numProc: dg().PROCESSO, limitesPorCatmat: limites });
+    ppItensPreview = r.itens || [];
+    window._ppUltimoResumo = r.resumo || [];
+    let resumoHtml = '<div class="mfsec">Resultado da busca</div>';
+    (r.resumo || []).forEach(function(res) {
+      const cor = res.total === 0 ? 'var(--red)' : 'var(--green)';
+      const labelTotal = res.parcial ? res.total + '+ (pode haver mais)' : 'de ' + res.total + ' total';
+      resumoHtml += `<div style="display:flex;justify-content:space-between;align-items:center;
+        padding:8px 12px;border-radius:7px;background:var(--gray1);border:1px solid var(--border);
+        margin-bottom:6px;font-size:12px;">
+        <div>
+          <span style="font-family:monospace;font-weight:700;color:var(--dark);">CATMAT ${res.catmat}</span>
+        </div>
+        <div style="text-align:right;flex-shrink:0;margin-left:12px;">
+          <div style="font-weight:700;color:${cor};font-size:14px;">${res.exibindo}</div>
+          <div style="font-size:10px;color:var(--gray4);">${labelTotal}</div>
+        </div>
+      </div>`;
+    });
+    if (r.total > 0) {
+      resumoHtml += `<div style="padding:10px 14px;border-radius:8px;background:#e8f5e9;
+        border:1px solid #c8e6c9;font-size:13px;color:#1b5e20;font-weight:600;margin-top:4px;">
+        ✅ ${r.total} resultado(s) selecionado(s) — prontos para gerar a planilha.
+      </div>`;
+    }
+    document.getElementById('pp-preview-resumo').innerHTML = resumoHtml;
+    document.getElementById('pp-mhint').textContent = r.total + ' resultado(s) selecionado(s)';
+  } catch(e) {
+    toast('❌', 'Erro ao reaplicar filtros', e.message, false);
+  }
+  ocultarLoading();
 }
 
 async function confirmarGerarPP() {
@@ -2492,7 +2590,128 @@ async function gasCall(acao, dados) {
     return { ok: true };
   }
 }
+// ══════════ LEITURA AUTOMÁTICA DO TR TÉCNICO ══════════
+var _trDadosExtraidos = null; // guarda os dados lidos para uso posterior
 
+function abrirLeituraTR(modalId) {
+  var input    = document.createElement('input');
+  input.type   = 'file';
+  input.accept = '.pdf';
+  input.onchange = function() {
+    if (!input.files.length) return;
+    _processarTR(input.files[0], modalId);
+  };
+  input.click();
+}
+
+async function _processarTR(file, modalId) {
+  var btn   = document.getElementById('btn-ler-tr-' + modalId);
+  var label = btn ? btn.querySelector('.blabel') : null;
+  if (btn)   { btn.disabled = true; }
+  if (label) { label.textContent = '⏳ Lendo o PDF…'; }
+
+  var reader = new FileReader();
+  reader.onload = async function(e) {
+    try {
+      var base64 = e.target.result.split(',')[1];
+
+      // Etapa 1 — faz o upload do PDF no Drive
+      var r1 = await gasCall('uploadPDF', {
+        pdfBase64:   base64,
+        nomeArquivo: file.name
+      });
+      if (!r1.ok) throw new Error(r1.erro || 'Falha no upload do PDF.');
+
+      // Etapa 2 — extrai as informações do TR
+      // Tenta pegar o ID da pasta do processo atual (se já existir)
+var pastaIdAtual = (typeof STATE !== 'undefined' && STATE.proc && STATE.proc.PASTA_ID)
+  ? STATE.proc.PASTA_ID : '';
+
+var r2 = await gasCall('extrairTRTecnico', {
+  idPdf:   r1.fileId,
+  pastaId: pastaIdAtual
+});
+      if (!r2.ok) throw new Error(r2.erro || 'Falha na leitura do TR.');
+
+      if (!r2.isPesquisavel) {
+        throw new Error('PDF sem texto legível. Verifique se é um PDF digital (não escaneado).');
+      }
+
+      // Salva os dados extraídos para uso posterior (ex: geração de documentos)
+      _trDadosExtraidos = r2;
+
+      // Preenche os campos conforme o modal que chamou
+      if (modalId === 'novo') {
+        if (r2.objeto) document.getElementById('n-obj').value = r2.objeto;
+      }
+      if (modalId === 'andamento') {
+        if (r2.objeto) document.getElementById('ea-obj').value = r2.objeto;
+        if (r2.itens && r2.itens.length > 0) {
+          _preencherItensAndamento(r2.itens);
+        }
+      }
+
+      // Exibe o card de resumo abaixo do botão
+      _mostrarPreviewTR(r2, 'tr-preview-' + modalId);
+
+    } catch(err) {
+      alert('Erro ao ler o TR Técnico:\n\n' + err.message);
+    } finally {
+      if (btn)   { btn.disabled = false; }
+      if (label) { label.textContent = 'Selecionar PDF do TR Técnico'; }
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function _preencherItensAndamento(itens) {
+  // Limpa a tabela de itens antes de preencher
+  var tabela = document.getElementById('ea-tabela-itens');
+  if (tabela) {
+    tabela.innerHTML = '<div style="color:var(--gray4);font-size:12px;'
+      + 'font-family:monospace;padding:8px;">Nenhum item cadastrado. Adicione abaixo.</div>';
+  }
+  // Para cada item extraído, simula o preenchimento e clica em "Adicionar item"
+  itens.forEach(function(it) {
+    document.getElementById('ea-item').value   = it.item   || '';
+    document.getElementById('ea-desc').value   = it.desc   || '';
+    document.getElementById('ea-catmat').value = it.catmat || '';
+    document.getElementById('ea-cod').value    = '';
+    eaAddItem(); // usa a função que já existe no seu app
+  });
+}
+
+function _mostrarPreviewTR(r, divId) {
+  var div = document.getElementById(divId);
+  if (!div) return;
+
+  var subconTexto  = r.subcon  === 'SUBCON_NAO'  ? 'Não admitida'
+                   : r.subcon  === 'SUBCON_SIM'  ? 'Admitida parcialmente' : '—';
+  var marcasTexto  = r.marcas  === 'MARCA'        ? 'Sim, há indicação de marcas'
+                   : r.marcas  === 'SEM_MARCA'    ? 'Não se aplica' : '—';
+  var amostraTexto = r.amostra === 'AMOSTRA'      ? 'Sim, será exigida amostra'
+                   : r.amostra === 'SEM_AMOSTRA'  ? 'Não se aplica' : '—';
+
+  var obj = (r.objeto && r.objeto.length > 90)
+    ? r.objeto.substring(0, 90) + '…'
+    : (r.objeto || '—');
+
+  var itensTexto = (r.itens && r.itens.length > 0)
+    ? r.itens.length + ' item(ns) encontrado(s)'
+    : 'Nenhum item identificado automaticamente';
+
+  div.innerHTML =
+    '<div style="background:#f0f9f0;border:1px solid #c8e6c9;border-radius:8px;'
+    + 'padding:10px 14px;margin-top:8px;font-size:11px;line-height:2;">'
+    + '<div style="font-weight:700;color:#2e7d32;margin-bottom:2px;">✅ TR lido com sucesso</div>'
+    + '<b>Objeto:</b> '    + obj          + '<br>'
+    + '<b>Itens:</b> '     + itensTexto   + '<br>'
+    + '<b>Subcontratação:</b> ' + subconTexto  + '<br>'
+    + '<b>Marcas:</b> '    + marcasTexto  + '<br>'
+    + '<b>Amostra:</b> '   + amostraTexto
+    + '</div>';
+  div.style.display = 'block';
+}
 // ══════════ UTILITÁRIOS ══════════
 function mapItem(it) {
   return {
@@ -3662,29 +3881,6 @@ function trToggleEntrega() {
     <div class="mftr">
       <button class="bcancelar" onclick="fecharOv('ov-despacho-pg')">Cancelar</button>
       <button class="bgerar" onclick="gerarDespachoPG()">📄 Gerar Despacho</button>
-    </div>
-  </div>
-</div>
-<!-- Modal Upload TR Técnico -->
-<div class="overlay" id="ov-upload-tr" onclick="fecharOv('ov-upload-tr',event)">
-  <div class="modal" onclick="event.stopPropagation()" style="max-width:480px;">
-    <div class="mhdr">
-      <div class="mdocl">📥 Importar · Fase Preparatória</div>
-      <div class="mtitle">Importar TR Técnico (PDF)</div>
-      <div class="mproc">O app extrai o objeto e os itens automaticamente</div>
-    </div>
-    <div class="mbody">
-      <div class="mfsec">Selecione o arquivo</div>
-      <div class="fe">
-        <label>TR Técnico em PDF</label>
-        <input type="file" id="tr-pdf-input" accept=".pdf" onchange="trPdfSelecionado(this)"/>
-      </div>
-      <div id="tr-pdf-aviso" class="mhint" style="display:none;"></div>
-      <div class="mhint">⚠️ Funciona apenas com PDFs pesquisáveis (não escaneados).</div>
-    </div>
-    <div class="mftr">
-      <button class="bcancelar" onclick="fecharOv('ov-upload-tr')">Cancelar</button>
-      <button class="bgerar" id="btn-extrair-tr" onclick="enviarTRParaExtracao()" disabled>📥 Extrair dados</button>
     </div>
   </div>
 </div>
