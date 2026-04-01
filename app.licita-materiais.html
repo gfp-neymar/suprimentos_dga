@@ -3324,10 +3324,59 @@ async function processarTermosHom(input) {
   preview.style.display = '';
   preview.innerHTML = '<div style="font-size:11px;color:#666;font-family:monospace;">Processando…</div>';
 
-  const resultados = []; // { itemNum, fornecedor, cnpj, valorUnit, fracassado }
+  // ── Mescla todos os PDFs em um único arquivo ──────────────────────
+  try {
+    preview.innerHTML = '<div style="font-size:11px;color:#666;font-family:monospace;">📎 Mesclando ' + files.length + ' PDF(s)…</div>';
+
+    const { PDFDocument } = await import('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js').catch(() => null)
+      || await new Promise(res => {
+          const s = document.createElement('script');
+          s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+          s.onload = () => res(window.PDFLib);
+          document.head.appendChild(s);
+        });
+
+    const merged = await (window.PDFLib || await _carregarPdfLib()).PDFDocument.create();
+
+    for (const file of files) {
+      const bytes = await file.arrayBuffer();
+      const doc   = await (window.PDFLib || PDFLib).PDFDocument.load(bytes);
+      const pages = await merged.copyPages(doc, doc.getPageIndices());
+      pages.forEach(p => merged.addPage(p));
+    }
+
+    const mergedBytes = await merged.save();
+    const uint8 = new Uint8Array(mergedBytes);
+    let binary = '';
+    const chunkSize = 8192;
+    for (let c = 0; c < uint8.length; c += chunkSize) {
+      binary += String.fromCharCode(...uint8.subarray(c, c + chunkSize));
+    }
+    const mergedBase64 = btoa(binary);
+const nomeMesclado = 'Termos_de_Homologacao_Mesclados_' + String(dg().PROCESSO || '').replace(/\//g,'_') + '.pdf';
+    preview.innerHTML = '<div style="font-size:11px;color:#666;font-family:monospace;">☁️ Salvando PDF mesclado no Drive…</div>';
+
+    const pastaId = procAtual.dadosGerais.PASTA_ID || '';
+    await gasCall('salvarPDFMesclado', {
+      pdfBase64: mergedBase64,
+      nomeArquivo: nomeMesclado,
+      pastaId: pastaId
+    });
+
+  } catch(eMerge) {
+    console.warn('Aviso: não foi possível mesclar PDFs:', eMerge.message);
+  }
+  // ──────────────────────────────────────────────────────────────────
+
+  const resultados = [];
 
   for (var i = 0; i < files.length; i++) {
     const file = files[i];
+    preview.innerHTML = '<div style="font-size:11px;color:#1565c0;font-family:monospace;">' +
+      '📄 Lendo arquivo ' + (i + 1) + ' de ' + files.length + ': ' + file.name +
+      '<br><div style="margin-top:4px;background:#e3f2fd;border-radius:4px;height:6px;">' +
+      '<div style="background:#1976d2;border-radius:4px;height:6px;width:' + Math.round(((i+1)/files.length)*100) + '%"></div>' +
+      '</div></div>';
     try {
       // Converte para base64
       const base64 = await new Promise((res, rej) => {
@@ -3365,7 +3414,7 @@ async function processarTermosHom(input) {
       preenchidos++;
     }
   });
-
+preview.innerHTML = '<div style="font-size:11px;color:#666;font-family:monospace;">✅ ' + files.length + ' arquivo(s) processados.</div>';
   // Preenche data de homologação se encontrada
   const comData = resultados.find(r => r.dataHom);
   if (comData) {
@@ -3386,6 +3435,16 @@ async function processarTermosHom(input) {
   btn.disabled = false;
   btn.querySelector('.blabel').textContent = 'Selecionar mais PDFs';
   input.value = ''; // permite re-selecionar os mesmos arquivos
+}
+function _carregarPdfLib() {
+  return new Promise(function(resolve, reject) {
+    if (window.PDFLib) { resolve(window.PDFLib); return; }
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+    s.onload  = function() { resolve(window.PDFLib); };
+    s.onerror = function() { reject(new Error('pdf-lib não carregou')); };
+    document.head.appendChild(s);
+  });
 }
 </script>
 
