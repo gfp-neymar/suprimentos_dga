@@ -821,6 +821,18 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
   <div class="modal" onclick="event.stopPropagation()" style="max-width:640px;">
     <div class="mhdr"><div class="mdocl">🔄 Utilitário · Item 16</div><div class="mtitle">Preencher Tabela de Homologação</div><div class="mproc" id="mhom-proc">—</div></div>
     <div class="mbody">
+      <!-- Importação dos Termos de Homologação -->
+      <div style="background:#e8f4fd;border:1px solid #bbdefb;border-radius:9px;padding:12px 14px;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;color:#1565c0;margin-bottom:4px;">📥 Importar Termos de Homologação (Compras.gov)</div>
+        <div style="font-size:11px;color:#4b5563;margin-bottom:8px;font-family:monospace;">Selecione os PDFs dos termos — valor e fornecedor serão preenchidos automaticamente</div>
+        <input type="file" id="hom-pdf-input" accept=".pdf" multiple style="display:none;" onchange="processarTermosHom(this)"/>
+        <button class="abtn util" style="width:100%;justify-content:center;padding:10px;" onclick="document.getElementById('hom-pdf-input').click()" id="btn-ler-termos">
+          <span class="bico">📄</span>
+          <span class="btxt"><span class="blabel">Selecionar PDFs dos Termos</span></span>
+        </button>
+        <div id="hom-import-preview" style="margin-top:8px;display:none;"></div>
+      </div>
+
       <div class="mfsec">✓ Itens da Tabela de Pesquisa de Preços</div>
       <div id="mhom-itens"></div>
       <div class="mfsec" style="margin-top:4px;">Data da Homologação</div>
@@ -1456,7 +1468,7 @@ function htmlFase1() {
 
   <div class="psec">Edital e Termo de Referência</div>
   ${btn('📄','Gerar TR Administrativo','Contratação, garantia, pagamento e forma de seleção','doc','abrirModalTRAdmin()')}
-  ${btn('📄','Gerar Edital','Modo de disputa, participação e cláusulas do pregão','doc',"abrirOv('ov-edital')")}
+  ${btn('📄','Gerar Edital','Modo de disputa, participação e cláusulas do pregão','doc',"abrirModalEdital()")}
 
   <div class="psec">Instrumento Contratual</div>
   ${btn('📄','Gerar Contrato','Escopo ou Fornecimento Contínuo','doc','abrirModalContrato()')}
@@ -1937,7 +1949,46 @@ function abrirPP() {
   ['pp-item','pp-desc','pp-catmat','pp-cod'].forEach(id => { document.getElementById(id).value = ''; });
   abrirOv('ov-pp');
 }
+function abrirModalEdital() {
+  const p = dg();
 
+  // Campos fixos — sempre preenchidos
+  document.getElementById('ed-r-proc').textContent = p.PROCESSO || '—';
+  document.getElementById('ed-r-obj').textContent  = p.ASSUNTO  || '—';
+
+  // Critério de julgamento — vem do TR Administrativo salvo
+  const julgMap = {
+    'MN_PRECO_GLOBAL': 'Menor Preço Global',
+    'MN_PRECO_LOTE':   'Menor Preço por Lote',
+    'MN_PRECO_ITEM':   'Menor Preço por Item',
+    'MAIOR_DESC':      'Maior Desconto'
+  };
+  document.getElementById('ed-r-julg').textContent =
+    julgMap[p.JULGAMENTO] || p.JULGAMENTO || '(não preenchido — gerado pelo TR Admin)';
+
+  // Comprador — usa campoChecklist pois pode estar vazio
+  campoChecklist({
+    containerId: 'ed-bloco-comp',
+    label:       'Comprador',
+    valor:       p.COMPRADOR,
+    fonte:       'Tabela 1 · criação do processo',
+    inputId:     'ed-comp-inline',
+    placeholder: 'Ex: Materiais'
+  });
+
+  // Preenche valor estimado e tipo de divulgação salvos anteriormente
+  const elValorTipo = document.getElementById('ed-valor-tipo');
+  const elValorEst  = document.getElementById('ed-valor-estimado');
+  const elValorFe   = document.getElementById('fe-ed-valor-estimado');
+  if (p.VALOR_TIPO) elValorTipo.value = p.VALOR_TIPO;
+  if (p.VALOR_ESTIMADO) elValorEst.value = p.VALOR_ESTIMADO;
+  elValorFe.style.display = (elValorTipo.value === 'VALOR_SIG') ? 'none' : '';
+
+  // Reseta a lógica de participação para o estado inicial
+  atualizarParticipacaoEdital();
+
+  abrirOv('ov-edital');
+}
 function renderTabelaItens() {
   const itens = procAtual.itens || [];
   let html = '';
@@ -2050,6 +2101,7 @@ function abrirHom() {
         <th style="padding:6px 8px;border-bottom:1px solid var(--border);">Descrição</th>
         <th style="padding:6px 8px;border-bottom:1px solid var(--border);">Valor Hom.</th>
         <th style="padding:6px 8px;border-bottom:1px solid var(--border);">Fornecedor</th>
+        <th style="padding:6px 8px;border-bottom:1px solid var(--border);">CNPJ</th>
       </tr>`;
     itens.forEach((it, i) => {
       html += `<tr>
@@ -2061,6 +2113,9 @@ function abrirHom() {
         <td style="padding:4px 6px;border-bottom:1px solid var(--border);">
           <input style="width:140px;padding:4px 6px;border:1px solid var(--border);border-radius:5px;font-size:12px;" placeholder="Fornecedor" id="hom-f-${i}" value="${it.FORNECEDOR||''}"/>
         </td>
+        <td style="padding:4px 6px;border-bottom:1px solid var(--border);">
+          <input style="width:110px;padding:4px 6px;border:1px solid var(--border);border-radius:5px;font-size:12px;" placeholder="00.000.000/0001-00" id="hom-c-${i}" value="${it.CNPJ_FORNECEDOR||''}"/>
+        </td>
       </tr>`;
     });
     html += '</table></div>';
@@ -2071,22 +2126,24 @@ function abrirHom() {
   document.getElementById('mhom-data').value = isoDate(p.DATA_HOMOLOG);
   abrirOv('ov-hom');
 }
-
 function abrirModalContrato() {
   const p = dg();
-  if (!p.PROCESSO) { toast('⚠️', 'Erro', 'Nenhum processo aberto.', false); return; }
+  document.getElementById('cont-r-proc').textContent = p.PROCESSO || '—';
+  document.getElementById('cont-r-obj').textContent  = p.ASSUNTO  || '—';
   document.getElementById('m-cont-proc').textContent = p.PROCESSO + ' · ' + p.INTERESSADO;
-  document.getElementById('cont-subtipo').value      = 'ESCOPO';
-  document.getElementById('cont-pagamento').value    = 'PAG_PRECO';
-  document.getElementById('cont-subcon').value       = 'SUBCON_NAO';
-  document.getElementById('cont-valor').value        = 'VALOR_ESTIMADO';
-  document.getElementById('cont-garantia').value     = 'SEM_GARANTIA';
-  document.getElementById('cont-tipo-garantia').value = 'EXIG_GAR_MIN';
-  document.getElementById('cont-prazo-garant').value  = '';
-  document.getElementById('cont-bloco-pagamento').style.display = '';
+  campoChecklist({
+    containerId: 'cont-bloco-comp',
+    label:       'Comprador',
+    valor:       p.COMPRADOR,
+    fonte:       'Tabela 1 · criação do processo',
+    inputId:     'cont-comp-inline',
+    placeholder: 'Ex: Materiais'
+  });
+  // Garante estado inicial correto do campo de prazo
+  document.getElementById('fe-cont-prazo-garant').style.display =
+    document.getElementById('cont-tipo-garantia').value === 'EXIG_GAR_MIN' ? '' : 'none';
   abrirOv('ov-contrato');
 }
-
 function contToggleSubtipo() {
   const subtipo = document.getElementById('cont-subtipo').value;
   document.getElementById('cont-bloco-pagamento').style.display = subtipo === 'ESCOPO' ? '' : 'none';
@@ -2102,8 +2159,11 @@ async function gerarContrato() {
   };
   if (subtipo === 'ESCOPO') {
     payload.pagamento    = document.getElementById('cont-pagamento').value;
-    payload.tipoGarantia = document.getElementById('cont-tipo-garantia') ? document.getElementById('cont-tipo-garantia').value : '';
-    payload.prazoGarant  = document.getElementById('cont-prazo-garant')  ? document.getElementById('cont-prazo-garant').value  : '';
+    const tipoGar = document.getElementById('cont-tipo-garantia').value;
+    payload.tipoGarantia = tipoGar;
+    payload.prazoGarant  = tipoGar === 'EXIG_GAR_MIN'
+      ? (document.getElementById('cont-prazo-garant').value || '')
+      : '';
   }
   fecharOv('ov-contrato');
   const acao   = subtipo === 'ESCOPO' ? 'gerarContratoEscopo' : 'gerarContratoFornCont';
@@ -2521,8 +2581,10 @@ async function gerarHom() {
   itens.forEach((it, i) => {
     const elV = document.getElementById('hom-v-' + i);
     const elF = document.getElementById('hom-f-' + i);
-    if (elV) it.VALOR_HOMOLOG = elV.value.trim();
-    if (elF) it.FORNECEDOR    = elF.value.trim();
+    if (elV) it.VALOR_HOMOLOG    = elV.value.trim();
+    if (elF) it.FORNECEDOR       = elF.value.trim();
+    const elC = document.getElementById('hom-c-' + i);
+    if (elC) it.CNPJ_FORNECEDOR  = elC.value.trim();
   });
   fecharOv('ov-hom');
   mostrarLoading('Salvando tabela de homologação…');
@@ -2721,7 +2783,8 @@ function mapItem(it) {
     cod_unicamp:   it.COD_UNICAMP   || it.cod         || '',
     valor:         it.VALOR         || it.valor       || '',
     valor_homolog: it.VALOR_HOMOLOG || it.valorHom    || '',
-    fornecedor:    it.FORNECEDOR    || it.fornecedor  || ''
+    fornecedor:    it.FORNECEDOR    || it.fornecedor  || '',
+    cnpj_fornecedor: it.CNPJ_FORNECEDOR || it.cnpjFornecedor || ''
   };
 }
 
@@ -2776,6 +2839,35 @@ function toast(icon, title, msg, ok) {
   note.className   = 'tnote' + (ok ? ' ok' : '');
   document.getElementById('toast').classList.add('v');
   toastTimer = setTimeout(fecharToast, 4500);
+}
+// ── Campo adaptável: leitura se preenchido, edição com aviso se vazio ──
+function campoChecklist(cfg) {
+  // cfg: { containerId, label, valor, fonte, inputId, placeholder, tipo }
+  var container = document.getElementById(cfg.containerId);
+  if (!container) return;
+
+  if (cfg.valor) {
+    // Valor já existe → mostra só leitura (padrão atual)
+    container.innerHTML =
+      '<div class="fro"><span class="fri">✓</span><div>' +
+      '<div class="frl">' + cfg.label + '</div>' +
+      '<div class="frv">' + cfg.valor + '</div>' +
+      '<div class="frs">← ' + cfg.fonte + '</div>' +
+      '</div></div>';
+  } else {
+    // Valor ausente → aviso + campo editável
+    container.innerHTML =
+      '<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;' +
+      'padding:9px 12px;margin-bottom:4px;">' +
+      '<div style="font-size:10px;font-weight:700;color:#795548;margin-bottom:6px;">' +
+      '⚠️ ' + cfg.label + ' não preenchido ainda — preencha agora ou volte à etapa anterior' +
+      '</div>' +
+      '<div class="fe" style="margin:0;">' +
+      '<input id="' + cfg.inputId + '" type="' + (cfg.tipo || 'text') + '" ' +
+      'placeholder="' + cfg.placeholder + '" ' +
+      'style="border-color:#ffb300;"/>' +
+      '</div></div>';
+  }
 }
 
 function fecharToast() { document.getElementById('toast').classList.remove('v'); }
@@ -2861,6 +2953,15 @@ async function gerarEdital() {
   mostrarLoading('Gerando Edital…');
   try {
     const isAquisicaoEd = (p.TIPO_CONTRATACAO || '') === 'Aquisicao';
+    const comprador  = p.COMPRADOR || v('ed-comp-inline') || '';
+    const valorTipo  = v('ed-valor-tipo') || 'VALOR_ABERTO';
+    const valorEstim = valorTipo !== 'VALOR_SIG' ? (v('ed-valor-estimado') || '') : '';
+    if (valorTipo !== 'VALOR_SIG' && !valorEstim) {
+      ocultarLoading();
+      if (btn) { btn.disabled = false; btn.textContent = labelOrig; }
+      alert('Informe o Valor Estimado ou selecione "Sigiloso".');
+      return;
+    }
     const res = await gasCall(isAquisicaoEd ? 'gerarEditalAquisicao' : 'gerarEdital', {
       numProc:      p.PROCESSO,
       PROCESSO:     p.PROCESSO,
@@ -2885,7 +2986,9 @@ async function gerarEdital() {
       quantPartReservada:   v('ed-quant-part-reservada') || '',
       quantPartAmpla:       v('ed-quant-part-ampla')     || '',
       difLance:     v('ed-dif-lance'),
-      amostra:      v('ed-amostra')
+      amostra:      v('ed-amostra'),
+      valorTipo:    valorTipo,
+      valorEstimado: valorEstim,
     });
     ocultarLoading();
     if (btn) { btn.disabled = false; btn.textContent = labelOrig; }
@@ -2900,7 +3003,14 @@ function abrirModalDespachoPG() {
   const p = dg();
   if (!p.PROCESSO) { toast('⚠️', 'Erro', 'Nenhum processo aberto.', false); return; }
   // Limpa campos
-['dp-intervalo-minutas','dp-n-etp','dp-n-pesq-mer','dp-n-edital','dp-n-contrato']    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['dp-intervalo-minutas','dp-n-etp','dp-n-pesq-mer','dp-n-edital','dp-n-contrato','dp-n-tr','dp-urg-texto']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const elUrg = document.getElementById('dp-urgencia');
+  if (elUrg) elUrg.value = 'NAO';
+  document.getElementById('fe-dp-urg-texto').style.display = 'none';
+  // Preenche leituras do checklist
+  document.getElementById('dp-r-comp').textContent = p.COMPRADOR  || '(não preenchido)';
+  document.getElementById('dp-r-matr').textContent = '(buscado automaticamente pelo nome do comprador)';
   abrirOv('ov-despacho-pg');
 }
 
@@ -2912,14 +3022,17 @@ async function gerarDespachoPG() {
   fecharOv('ov-despacho-pg');
   mostrarLoading('Gerando Despacho PG…');
   try {
-    const res = await gasCall('gerarDespacho', {
-      numProc:          p.PROCESSO,
+    const urgSim  = v('dp-urgencia') === 'SIM';
+const res = await gasCall('gerarDespachoPG', {
+        numProc:          p.PROCESSO,
       doc_sigad:        sigadDoc,
       intervaloMinutas: v('dp-intervalo-minutas') || '',
       nEtp:             v('dp-n-etp')             || '',
       nPesqMer:         v('dp-n-pesq-mer')        || '',
       nEdital:          v('dp-n-edital')           || '',
-      nContrato:        v('dp-n-contrato')         || ''
+      nTr:              v('dp-n-tr')              || '',
+      nContrato:        v('dp-n-contrato')         || '',
+      urgTexto:         urgSim ? (v('dp-urg-texto') || '') : ''
     });
     ocultarLoading();
     if (res.docUrl) window.open(res.docUrl, '_blank');
@@ -3130,8 +3243,22 @@ function trAtualizarVigencia() {
 }
 
 function abrirModalTRAdmin() {
-  const tipo = dg().TIPO_CONTRATACAO || '';
+  const p = dg();
+  const tipo = p.TIPO_CONTRATACAO || '';
   const isAquisicao = tipo === 'Aquisicao';
+
+  // Preenche campos lidos do checklist
+  document.getElementById('tr-r-proc').textContent = p.PROCESSO || '—';
+  document.getElementById('tr-r-obj').textContent  = p.ASSUNTO  || '—';
+  document.getElementById('tr-r-tipo').textContent = isAquisicao ? 'Aquisição de Material' : 'Registro de Preços (SRP)';
+  campoChecklist({
+    containerId: 'tr-bloco-comp',
+    label:       'Comprador',
+    valor:       p.COMPRADOR,
+    fonte:       'Tabela 1 · criação do processo',
+    inputId:     'tr-comp-inline',
+    placeholder: 'Ex: Materiais'
+  });
 
   const ids = [
     'tr-secao-aquisicao','tr-secao-recursos','fe-tr-vig-contr',
@@ -3168,6 +3295,97 @@ function trToggleEntrega() {
   const val = document.getElementById('tr-tipo-entrega').value;
   document.getElementById('fe-tr-vig-contr').style.display         = val === 'FORN_CONT'   ? '' : 'none';
   document.getElementById('fe-tr-instrumento-bloco').style.display = val === 'ENTREG_IMED' ? '' : 'none';
+}
+function atualizarParticipacaoEdital() {
+  var partic    = document.getElementById('ed-participacao').value;
+  var tratFav   = document.getElementById('ed-trat-favorec').value;
+  var isMista   = partic === 'PART_MISTA';
+
+  // Campos de quantidade só fazem sentido na participação Mista
+  // pois é quando os itens se dividem entre exclusivo e ampla
+  document.getElementById('fe-part-exclusiva').style.display =
+    (isMista && tratFav === 'PART_EXCLU_MICRO') ? '' : 'none';
+
+  document.getElementById('fe-part-reservada').style.display =
+    (isMista && tratFav === 'PART_RESER_MICRO') ? '' : 'none';
+
+  document.getElementById('fe-part-ampla').style.display =
+    (isMista && tratFav === 'PART_AMPLA') ? '' : 'none';
+}
+async function processarTermosHom(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  const btn = document.getElementById('btn-ler-termos');
+  btn.disabled = true;
+  btn.querySelector('.blabel').textContent = 'Lendo ' + files.length + ' arquivo(s)…';
+
+  const preview = document.getElementById('hom-import-preview');
+  preview.style.display = '';
+  preview.innerHTML = '<div style="font-size:11px;color:#666;font-family:monospace;">Processando…</div>';
+
+  const resultados = []; // { itemNum, fornecedor, cnpj, valorUnit, fracassado }
+
+  for (var i = 0; i < files.length; i++) {
+    const file = files[i];
+    try {
+      // Converte para base64
+      const base64 = await new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result.split(',')[1]);
+        r.onerror = () => rej(new Error('Erro ao ler arquivo'));
+        r.readAsDataURL(file);
+      });
+
+      // Upload e parse
+      const r1 = await gasCall('uploadPDF', { pdfBase64: base64, nomeArquivo: file.name });
+      if (!r1.ok) throw new Error('Falha no upload');
+
+      const r2 = await gasCall('parsearTermoHom', { fileId: r1.fileId });
+      if (r2.ok && r2.item) resultados.push(r2.item);
+
+    } catch(e) {
+      resultados.push({ erro: true, arquivo: file.name, msg: e.message });
+    }
+  }
+
+  // Preenche os campos da tabela com os resultados
+  let preenchidos = 0;
+  const itens = procAtual.itens || [];
+  resultados.forEach(res => {
+    if (res.erro || res.fracassado) return;
+    const idx = itens.findIndex(it => String(it.ITEM).trim() === String(res.itemNum).trim());
+    if (idx >= 0) {
+      const elV = document.getElementById('hom-v-' + idx);
+      const elF = document.getElementById('hom-f-' + idx);
+      const elC = document.getElementById('hom-c-' + idx); // CNPJ
+      if (elV) elV.value = res.valorUnit;
+      if (elF) elF.value = res.fornecedor;
+      if (elC) elC.value = res.cnpj;
+      preenchidos++;
+    }
+  });
+
+  // Preenche data de homologação se encontrada
+  const comData = resultados.find(r => r.dataHom);
+  if (comData) {
+    const elData = document.getElementById('mhom-data');
+    if (elData && !elData.value) elData.value = comData.dataHom;
+  }
+
+  // Mostra resumo
+  const fracassados = resultados.filter(r => r.fracassado).map(r => 'Item ' + r.itemNum);
+  const erros = resultados.filter(r => r.erro);
+  let html = '<div style="font-size:11px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:6px;padding:8px 10px;">';
+  html += '✅ ' + preenchidos + ' item(ns) preenchidos automaticamente.';
+  if (fracassados.length) html += '<br>⚠️ Fracassados (sem fornecedor): ' + fracassados.join(', ');
+  if (erros.length) html += '<br>❌ Erros em ' + erros.length + ' arquivo(s)';
+  html += '</div>';
+  preview.innerHTML = html;
+
+  btn.disabled = false;
+  btn.querySelector('.blabel').textContent = 'Selecionar mais PDFs';
+  input.value = ''; // permite re-selecionar os mesmos arquivos
 }
 </script>
 
@@ -3235,7 +3453,10 @@ function trToggleEntrega() {
     </div>
     <div class="mbody">
       <div class="mfsec">✓ Lido automaticamente do Checklist</div>
-      <div class="mhint" style="margin-bottom:8px;">Número do processo, objeto, comprador e data de hoje são preenchidos automaticamente.</div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="tr-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="tr-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
+      <div id="tr-bloco-comp"></div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Tipo de Contratação</div><div class="frv" id="tr-r-tipo">—</div><div class="frs">← Tabela 1</div></div></div>
 
       <!-- SEÇÃO EXCLUSIVA AQUISIÇÃO -->
       <div id="tr-secao-aquisicao" style="display:none;">
@@ -3422,7 +3643,25 @@ function trToggleEntrega() {
     </div>
     <div class="mbody">
       <div class="mfsec">✓ Lido automaticamente</div>
-      <div class="mhint" style="margin-bottom:8px;">Número do processo, objeto, valor estimado e critério de julgamento são preenchidos automaticamente a partir do Checklist e do TR Administrativo.</div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="ed-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="ed-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
+      <div id="ed-bloco-comp"></div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Critério de Julgamento</div><div class="frv" id="ed-r-julg">—</div><div class="frs">← TR Administrativo</div></div></div>
+      <div class="fe">
+        <label>Divulgação de Valores <span class="req">*</span></label>
+        <select id="ed-valor-tipo" onchange="
+          document.getElementById('fe-ed-valor-estimado').style.display =
+            this.value === 'VALOR_SIG' ? 'none' : '';
+        ">
+          <option value="VALOR_ABERTO">Tabela Aberta</option>
+          <option value="VALOR_ABERTO_DESC">Referência c/ Desconto</option>
+          <option value="VALOR_SIG">Sigiloso</option>
+        </select>
+      </div>
+      <div class="fe" id="fe-ed-valor-estimado">
+        <label>Valor Estimado <span class="req">*</span></label>
+        <input id="ed-valor-estimado" placeholder="Ex: R$ 120.000,00"/>
+      </div>
 
       <div class="mfsec">Modo de Disputa e Participação</div>
       <div class="row2">
@@ -3442,10 +3681,10 @@ function trToggleEntrega() {
           </select>
         </div>
       </div>
-      <div class="row2">
+<div class="row2">
         <div class="fe">
           <label>Participação Principal <span class="req">*</span></label>
-          <select id="ed-participacao">
+          <select id="ed-participacao" onchange="atualizarParticipacaoEdital()">
             <option value="PART_AMPLA">Ampla Concorrência</option>
             <option value="PART_EXCLUS">Exclusiva ME/EPP</option>
             <option value="PART_COTA">Cota Reservada</option>
@@ -3453,12 +3692,8 @@ function trToggleEntrega() {
           </select>
         </div>
         <div class="fe">
-          <label>Regras de participação/Tratamento favorecido <span class="req">*</span></label>
-          <select id="ed-trat-favorec" onchange="
-            document.getElementById('fe-part-exclusiva').style.display = this.value === 'PART_EXCLU_MICRO' ? '' : 'none';
-            document.getElementById('fe-part-reservada').style.display = this.value === 'PART_RESER_MICRO' ? '' : 'none';
-            document.getElementById('fe-part-ampla').style.display     = this.value === 'PART_AMPLA'       ? '' : 'none';
-          ">
+          <label>Regras / Tratamento Favorecido <span class="req">*</span></label>
+          <select id="ed-trat-favorec" onchange="atualizarParticipacaoEdital()">
             <option value="PART_EXCLU_MICRO">Exclusiva ME/EPP</option>
             <option value="PART_RESER_MICRO">Reserva de Cota</option>
             <option value="PART_AMPLA">Ampla Participação</option>
@@ -3466,6 +3701,28 @@ function trToggleEntrega() {
           </select>
         </div>
       </div>
+
+      <!-- Campos de quantidade — só visíveis quando Participação = Mista -->
+      <div id="fe-part-exclusiva" style="display:none;">
+        <div class="fe">
+          <label>Itens com participação exclusiva ME/EPP</label>
+          <input id="ed-quant-part-exclusiva" placeholder="Ex: 2, 3, 6"/>
+          <span class="hint">Informe os números dos itens separados por vírgula</span>
+        </div>
+      </div>
+      <div id="fe-part-reservada" style="display:none;">
+        <div class="fe">
+          <label>Itens com cota reservada ME/EPP</label>
+          <input id="ed-quant-part-reservada" placeholder="Ex: 1, 4"/>
+        </div>
+      </div>
+      <div id="fe-part-ampla" style="display:none;">
+        <div class="fe">
+          <label>Itens com ampla participação</label>
+          <input id="ed-quant-part-ampla" placeholder="Ex: 5, 7"/>
+          <span class="hint">Informe os números dos itens separados por vírgula</span>
+        </div>
+      </div>      
       <div class="fe" id="fe-part-exclusiva" style="display:none;">
         <label>Itens com participação exclusiva ME/EPP</label>
         <input id="ed-quant-part-exclusiva" placeholder="Ex: 2, 3, 6"/>
@@ -3479,200 +3736,6 @@ function trToggleEntrega() {
         <input id="ed-quant-part-ampla" placeholder="Ex: 5, 7"/>
       </div>
 
-      <div class="row2">
-        <div class="fe">
-          <label>Divisão do Objeto <span class="req">*</span></label>
-          <select id="ed-divisao" onchange="
-            var v = this.value;
-            document.getElementById('fe-qtd-itens').style.display = v === 'ITEM_DIV'  ? '' : 'none';
-            document.getElementById('fe-qtd-grup').style.display  = v === 'ITEM_GRUP' ? '' : 'none';
-          ">
-            <option value="ITEM_DIV">Itens Independentes</option>
-            <option value="ITEM_UNICO">Item Único</option>
-            <option value="ITEM_GRUP">Grupos</option>
-            <option value="ITEM_GRUP_UNICO">Grupo Único</option>
-          </select>
-        </div>
-        <div class="fe">
-          <label>Diferença de Lances <span class="req">*</span></label>
-          <select id="ed-dif-lance" onchange="
-            document.getElementById('fe-text-porcent').style.display =
-              this.value === 'DIF_LANCE_PERCEN' ? '' : 'none';
-          ">
-            <option value="DIF_LANCE_INTER">Intervalo Fixo</option>
-            <option value="DIF_LANCE_PERCEN">Percentual</option>
-          </select>
-        </div>
-      </div>
-      <div class="row2">
-        <div class="fe" id="fe-qtd-itens">
-          <label>Qtd. Itens da Divisão</label>
-          <input id="ed-qtd-itens" type="number" min="0" placeholder="Ex: 10"/>
-        </div>
-        <div class="fe" id="fe-qtd-grup" style="display:none;">
-          <label>Qtd. Grupos</label>
-          <input id="ed-qtd-grup" type="number" min="0" placeholder="Ex: 2"/>
-        </div>
-      </div>
-      <div class="fe" id="fe-text-porcent" style="display:none;">
-        <label>Texto Percentual</label>
-        <input id="ed-text-porcent" value="1% (um) por cento"/>
-      </div>
-
-      <div class="mfsec">Amostras</div>
-      <div class="fe">
-        <label>Amostras <span class="req">*</span></label>
-        <select id="ed-amostra">
-          <option value="AMOSTRA">Não exige</option>
-          <option value="AMOSTRA_NAO_ACOMP">Exige, não acompanha proposta</option>
-          <option value="AMOSTRA_ACOMP">Exige, acompanha proposta</option>
-        </select>
-      </div>
-
-      <div class="mfsec">Habilitação e Cláusulas (Sim / Não)</div>
-      <div class="row2">
-        <div class="fe">
-          <label>Financiamento Estrangeiro <span class="req">*</span></label>
-          <select id="ed-finan-estrang">
-            <option value="SEM_FINAN_ESTRANG">Não</option>
-            <option value="FINAN_ESTRANG">Sim</option>
-          </select>
-        </div>
-        <div class="fe">
-          <label>Exige Marca <span class="req">*</span></label>
-          <select id="ed-marca" onchange="
-            document.getElementById('fe-text-marca').style.display =
-              this.value === 'MARCA' ? '' : 'none';
-          ">
-            <option value="SEM_MARCA">Não</option>
-            <option value="MARCA">Sim</option>
-          </select>
-        </div>
-      </div>
-      <div class="row2">
-        <div class="fe">
-          <label>Exige Fabricante <span class="req">*</span></label>
-          <select id="ed-fabricante" onchange="
-            document.getElementById('fe-text-fabric').style.display =
-              this.value === 'FABRICANTE' ? '' : 'none';
-          ">
-            <option value="SEM_FABRICANTE">Não</option>
-            <option value="FABRICANTE">Sim</option>
-          </select>
-        </div>
-        <div class="fe">
-          <label>Prova de Conceito <span class="req">*</span></label>
-          <select id="ed-prova-conceito">
-            <option value="SEM_PROVA_CONCEITO">Não</option>
-            <option value="PROVA_CONCEITO">Sim</option>
-          </select>
-        </div>
-      </div>
-      <div class="fe" id="fe-text-marca" style="display:none;">
-        <label>Texto Marca</label>
-        <input id="ed-text-marca" placeholder="Ex: conforme especificado no TR"/>
-      </div>
-      <div class="fe" id="fe-text-fabric" style="display:none;">
-        <label>Texto Fabricante</label>
-        <input id="ed-text-fabric" placeholder="Ex: conforme especificado no TR"/>
-      </div>
-      <div class="row2">
-        <div class="fe">
-          <label>Inversão de Fases / Hab. Antecipada <span class="req">*</span></label>
-          <select id="ed-hab-prop">
-            <option value="SEM_HAB_PROP">Não</option>
-            <option value="HAB_PROP">Sim</option>
-          </select>
-        </div>
-        <div class="fe">
-          <label>Consórcio <span class="req">*</span></label>
-          <select id="ed-consorcio">
-            <option value="CONSORCIO_NAO">Não permitido</option>
-            <option value="CONSORCIO_SIM">Permitido</option>
-          </select>
-        </div>
-      </div>
-      <div class="fe">
-        <label>Cooperativas <span class="req">*</span></label>
-        <select id="ed-cooperativa">
-          <option value="COOP_NAO">Não permitido</option>
-          <option value="COOP_SIM">Permitido</option>
-        </select>
-      </div>
-      <div class="mhint">⚠️ Opções NÃO selecionadas aparecerão com tachado em vermelho no documento.</div>
-    </div>
-    <div class="mftr">
-      <button class="bcancelar" onclick="fecharOv('ov-edital')">Cancelar</button>
-      <button class="bgerar" id="btn-gerar-edital" onclick="gerarEdital()">📄 Gerar Edital</button>
-    </div>
-  </div>
-</div>
-              <!-- Modal Edital -->
-<div class="overlay" id="ov-edital" onclick="fecharOv('ov-edital',event)">
-  <div class="modal" onclick="event.stopPropagation()" style="max-width:640px;">
-    <div class="mhdr">
-      <div class="mdocl">📄 Documento · Fase Preparatória</div>
-      <div class="mtitle">Gerar Edital do Pregão</div>
-      <div class="mproc">Objeto e valor são lidos automaticamente do processo e do TR salvo</div>
-    </div>
-    <div class="mbody">
-      <div class="mfsec">✓ Lido automaticamente</div>
-      <div class="mhint" style="margin-bottom:8px;">Número do processo, objeto, valor estimado e critério de julgamento são preenchidos automaticamente a partir do Checklist e do TR Administrativo.</div>
-
-      <div class="mfsec">Modo de Disputa e Participação</div>
-      <div class="row2">
-        <div class="fe">
-          <label>Modo de Disputa <span class="req">*</span></label>
-          <select id="ed-modo-disputa">
-            <option value="MD_ABERTO">Aberto</option>
-            <option value="MD_ABERTO_E_FECH">Aberto e Fechado</option>
-            <option value="MD_FECH_E_ABERTO">Fechado e Aberto</option>
-          </select>
-        </div>
-        <div class="fe">
-          <label>Modo Oferta Lance <span class="req">*</span></label>
-          <select id="ed-modo-lance">
-            <option value="lance_valor_unit">Valor Unitário</option>
-            <option value="lance_valor_lote">Valor do Lote</option>
-          </select>
-        </div>
-      </div>
-      <div class="row2">
-        <div class="fe">
-          <label>Participação Principal <span class="req">*</span></label>
-          <select id="ed-participacao">
-            <option value="PART_AMPLA">Ampla Concorrência</option>
-            <option value="PART_EXCLUS">Exclusiva ME/EPP</option>
-            <option value="PART_COTA">Cota Reservada</option>
-            <option value="PART_MISTA">Mista</option>
-          </select>
-        </div>
-<div class="fe">
-  <label>Regras de participação/Tratamento favorecido <span class="req">*</span></label>
-  <select id="ed-trat-favorec" onchange="
-    document.getElementById('fe-part-exclusiva').style.display = this.value === 'PART_EXCLU_MICRO' ? '' : 'none';
-    document.getElementById('fe-part-reservada').style.display = this.value === 'PART_RESER_MICRO' ? '' : 'none';
-    document.getElementById('fe-part-ampla').style.display     = this.value === 'PART_AMPLA'       ? '' : 'none';
-  ">
-    <option value="PART_EXCLU_MICRO">Exclusiva ME/EPP</option>
-    <option value="PART_RESER_MICRO">Reserva de Cota</option>
-    <option value="PART_AMPLA">Ampla Participação</option>
-    <option value="SEM_TRAT_FAVORECIDO">Sem Tratamento</option>
-  </select>
-</div>
-<div class="fe" id="fe-part-exclusiva" style="display:none;">
-  <label>Itens com participação exclusiva ME/EPP</label>
-  <input id="ed-quant-part-exclusiva" placeholder="Ex: 2, 3, 6"/>
-</div>
-<div class="fe" id="fe-part-reservada" style="display:none;">
-  <label>Itens com cota reservada ME/EPP</label>
-  <input id="ed-quant-part-reservada" placeholder="Ex: 1, 4"/>
-</div>
-<div class="fe" id="fe-part-ampla" style="display:none;">
-  <label>Itens com ampla participação</label>
-  <input id="ed-quant-part-ampla" placeholder="Ex: 5, 7"/>
-</div>
-      </div>
       <div class="row2">
         <div class="fe">
           <label>Divisão do Objeto <span class="req">*</span></label>
@@ -3876,8 +3939,27 @@ function trToggleEntrega() {
         <label>Item principal e item cota reservada</label>
         <input id="dp-mista-itens" placeholder="Ex: item 1 é Cota Principal e item 2 é Cota Reservada"/>
       </div>
-      <div class="mhint">⚠️ Critérios do Edital e justificativas são preenchidos automaticamente a partir dos dados salvos no processo.</div>
-    </div>
+<div class="mfsec">Urgência</div>
+      <div class="fe">
+        <label>Solicitar urgência na análise?</label>
+        <select id="dp-urgencia" onchange="
+          document.getElementById('fe-dp-urg-texto').style.display =
+            this.value === 'SIM' ? '' : 'none';
+        ">
+          <option value="NAO">Não</option>
+          <option value="SIM">Sim</option>
+        </select>
+      </div>
+      <div class="fe" id="fe-dp-urg-texto" style="display:none;">
+        <label>Motivo e Nº do documento</label>
+        <input id="dp-urg-texto" placeholder="Ex: prazo exíguo, conforme informado no doc. nº (32)"/>
+      </div>
+
+      <div class="mfsec">✓ Lido do Checklist</div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Comprador</div><div class="frv" id="dp-r-comp">—</div><div class="frs">← Tabela 1</div></div></div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Matrícula</div><div class="frv" id="dp-r-matr">—</div><div class="frs">← Tabela 1</div></div></div>
+      <div class="mhint">⚠️ Critérios do Edital são preenchidos automaticamente a partir dos dados salvos no processo.</div>
+        </div>
     <div class="mftr">
       <button class="bcancelar" onclick="fecharOv('ov-despacho-pg')">Cancelar</button>
       <button class="bgerar" onclick="gerarDespachoPG()">📄 Gerar Despacho</button>
@@ -4056,7 +4138,9 @@ function trToggleEntrega() {
     </div>
     <div class="mbody">
       <div class="mfsec">✓ Lido automaticamente</div>
-      <div class="mhint" style="margin-bottom:8px;">Número do processo e objeto são preenchidos automaticamente.</div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="cont-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
+      <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="cont-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
+      <div id="cont-bloco-comp"></div>
 
       <div class="mfsec">Tipo de Contrato</div>
       <div class="fe">
@@ -4104,15 +4188,18 @@ function trToggleEntrega() {
           </select>
         </div>
         <div class="fe">
-          <label>Tipo de Garantia <span class="req">*</span></label>
-          <select id="cont-tipo-garantia">
+          <label>Garantia complementar à legal <span class="req">*</span></label>
+          <select id="cont-tipo-garantia" onchange="
+            document.getElementById('fe-cont-prazo-garant').style.display =
+              this.value === 'EXIG_GAR_MIN' ? '' : 'none';
+          ">
             <option value="EXIG_GAR_MIN">Garantia Mínima Exigida</option>
             <option value="GAR_DECL_PROP">Garantia Declarada na Proposta</option>
           </select>
         </div>
       </div>
-      <div class="fe">
-        <label>Prazo da Garantia</label>
+      <div class="fe" id="fe-cont-prazo-garant">
+        <label>Prazo de Garantia Complementar à Legal</label>
         <input id="cont-prazo-garant" placeholder="Ex: 12 (doze) meses"/>
       </div>
     </div>
