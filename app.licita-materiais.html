@@ -599,10 +599,11 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
   <div class="modal" onclick="event.stopPropagation()">
     <div class="mhdr"><div class="mdocl">📄 Documento · Item 14.4</div><div class="mtitle">Ato de Designação</div><div class="mproc" id="m144-proc">—</div></div>
     <div class="mbody">
-      <div class="mfsec">✓ Lido do Checklist</div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="m144-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m144-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
-      <div class="mfsec">✏️ Preencher</div>
+<div class="mfsec">✓ Lido automaticamente</div>
+<div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="m144-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
+<div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m144-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
+<div id="m144-bloco-npreg"></div>
+<div class="mfsec">✏️ Preencher</div>
       <div class="fe"><label>Pregoeiro <span class="req">*</span> <span id="m144-preg-badge"></span></label>
         <select id="m144-pregoeiro">
           <option value="">Selecione...</option>
@@ -645,14 +646,14 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
   <div class="modal" onclick="event.stopPropagation()">
     <div class="mhdr"><div class="mdocl">📄 Documento · Item 14.8</div><div class="mtitle">Aviso de Abertura</div><div class="mproc" id="m148-proc">—</div></div>
     <div class="mbody">
-      <div class="mfsec">✓ Lido do Checklist</div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="m148-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m148-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Pregoeiro</div><div class="frv" id="m148-r-preg">—</div><div class="frs">← Tabela 10</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Nº Pregão</div><div class="frv" id="m148-r-npreg">—</div><div class="frs">← Salvo na etapa 14.2</div></div></div>
-      <div class="mfsec">✏️ Preencher</div>
-      <div class="row2">
-        <div class="fe" style="display:none;"><label>Nº Pregão</label><input id="m148-npreg"/></div>
+<div class="mfsec">✓ Lido automaticamente</div>
+<div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="m148-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
+<div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m148-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
+<div id="m148-bloco-preg"></div>
+<div id="m148-bloco-npreg"></div>
+<div class="mfsec">✏️ Preencher</div>
+<div class="row2">
+          <div class="fe" style="display:none;"><label>Nº Pregão</label><input id="m148-npreg"/></div>
         <div class="fe">
           <label>Data de Publicação <span class="req">*</span> <span id="m148-pub-badge"></span></label>
           <input id="m148-dpub" type="date" onchange="validarDatas148()"/>
@@ -679,14 +680,14 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
 <div class="overlay" id="ov-149" onclick="fecharOv('ov-149',event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="mhdr"><div class="mdocl">✉️ E-mail · Item 14.9</div><div class="mtitle">E-mail Gibbor — Folha de SP</div><div class="mproc" id="m149-proc">—</div></div>
-    <div class="mbody">
-      <div class="mfsec">✓ Lido do Checklist</div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Nº Pregão</div><div class="frv" id="m149-r-preg">—</div><div class="frs">← Tabela 6</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m149-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Data Publicação</div><div class="frv" id="m149-r-dpub">—</div><div class="frs">← Tabela 11</div></div></div>
-      <div class="mfsec">Prévia do rascunho</div>
-      <div class="aviso-box" id="m149-preview" style="background:#f8f9ff;border-color:#c5cae9;color:#37474f;">—</div>
-    </div>
+<div class="mbody">
+  <div class="mfsec">✓ Lido automaticamente</div>
+  <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m149-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
+  <div id="m149-bloco-npreg"></div>
+  <div id="m149-bloco-dpub"></div>
+  <div class="mfsec">Prévia do rascunho</div>
+  <div class="aviso-box" id="m149-preview" style="background:#f8f9ff;border-color:#c5cae9;color:#37474f;">—</div>
+</div>
     <div class="mftr">
       <div class="mhint">Cria rascunho no Gmail</div>
       <div class="macts">
@@ -701,15 +702,15 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
 <div class="overlay" id="ov-1413" onclick="fecharOv('ov-1413',event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="mhdr"><div class="mdocl">✉️ E-mail · Item 14.13</div><div class="mtitle">E-mail de Abertura aos Interessados</div><div class="mproc" id="m1413-proc">—</div></div>
-    <div class="mbody">
-      <div class="mfsec">✓ Lido do Checklist</div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Nº Pregão</div><div class="frv" id="m1413-r-preg">—</div><div class="frs">← Tabela 6</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m1413-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Data do Pregão</div><div class="frv" id="m1413-r-dpreg">—</div><div class="frs">← Tabela 7</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Pregoeiro</div><div class="frv" id="m1413-r-preg2">—</div><div class="frs">← Tabela 10</div></div></div>
-      <div class="mfsec">Prévia do rascunho</div>
-      <div class="aviso-box" id="m1413-preview" style="background:#f8f9ff;border-color:#c5cae9;color:#37474f;">—</div>
-    </div>
+<div class="mbody">
+  <div class="mfsec">✓ Lido automaticamente</div>
+  <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m1413-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
+  <div id="m1413-bloco-npreg"></div>
+  <div id="m1413-bloco-dpreg"></div>
+  <div id="m1413-bloco-preg"></div>
+  <div class="mfsec">Prévia do rascunho</div>
+  <div class="aviso-box" id="m1413-preview" style="background:#f8f9ff;border-color:#c5cae9;color:#37474f;">—</div>
+</div>
     <div class="mftr">
       <div class="mhint">Para: supri.materiais@dga.unicamp.br · Cc: centralpreg@dga.unicamp.br</div>
       <div class="macts">
@@ -724,17 +725,17 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
 <div class="overlay" id="ov-1414" onclick="fecharOv('ov-1414',event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="mhdr"><div class="mdocl">📄 Documento · Item 14.14</div><div class="mtitle">Despacho p/ Central de Pregão</div><div class="mproc" id="m1414-proc">—</div></div>
-    <div class="mbody">
-      <div class="mfsec">✓ Lido do Checklist</div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="m1414-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Nº Pregão</div><div class="frv" id="m1414-r-preg">—</div><div class="frs">← Tabela 6</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Data do Pregão</div><div class="frv" id="m1414-r-dpreg">—</div><div class="frs">← Tabela 7</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Pregoeiro</div><div class="frv" id="m1414-r-pregoeiro">—</div><div class="frs">← Tabela 10</div></div></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m1414-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
-    </div>
-    <div class="mftr">
-      <div class="mhint">Todos os campos já preenchidos</div>
-      <div class="macts">
+<div class="mbody">
+  <div class="mfsec">✓ Lido automaticamente</div>
+  <div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="m1414-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
+  <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="m1414-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
+  <div id="m1414-bloco-npreg"></div>
+  <div id="m1414-bloco-dpreg"></div>
+  <div id="m1414-bloco-preg"></div>
+</div>
+<div class="mftr">
+  <div class="mhint">Documento gerado no Drive</div>
+        <div class="macts">
         <button class="bcancelar" onclick="fecharOv('ov-1414')">Cancelar</button>
         <button class="bgerar" onclick="gerar1414()">⚡ Gerar documento</button>
       </div>
@@ -766,19 +767,18 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
 
 <!-- Modal Pesquisa de Preços -->
 <div class="overlay" id="ov-pp" onclick="fecharOv('ov-pp',event)">
-  <div class="modal" onclick="event.stopPropagation()" style="max-width:620px;">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:800px;width:96vw;">
     <div class="mhdr">
       <div class="mdocl">🔍 Utilitário · Item 7</div>
       <div class="mtitle">Pesquisa de Preços (CATMAT)</div>
       <div class="mproc" id="mpp-proc">—</div>
     </div>
-    <div class="mbody">
-
-      <!-- PASSO 1: Configuração -->
+    <div class="mbody" style="max-height:70vh;overflow-y:auto;">
+ 
+      <!-- PASSO 1: Configuração dos itens -->
       <div id="pp-passo1">
         <div class="mfsec">Itens do processo</div>
         <div id="mpp-itens"></div>
-
         <div class="mfsec" style="margin-top:12px;">Adicionar item manualmente</div>
         <div style="display:grid;grid-template-columns:60px 1fr 110px 110px;gap:8px;align-items:end;">
           <div class="fe"><label>Item</label><input id="pp-item" placeholder="11"/></div>
@@ -787,35 +787,29 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
           <div class="fe"><label>Cód. Unicamp</label><input id="pp-cod" placeholder="00000"/></div>
         </div>
         <button class="bgerar" style="margin-top:8px;width:100%;justify-content:center;" onclick="addItemPP()">+ Adicionar item</button>
-
-        </div>
-
-      <!-- PASSO 2: Preview dos resultados -->
+      </div>
+ 
+      <!-- PASSO 2: Curadoria por CATMAT -->
       <div id="pp-passo2" style="display:none;">
-        <div id="pp-preview-resumo"></div>
+        <div id="pp-curadoria-container"></div>
         <div id="pp-preview-aviso-zero" style="display:none;">
           <div class="aviso-box" style="margin-bottom:12px;">
-            ⚠️ Nenhum resultado encontrado para o período atual (últimos 2 anos). Tente ampliar o período pesquisando por ano anterior.
+            ⚠️ Nenhum resultado encontrado. Verifique o CATMAT ou amplie o período.
           </div>
         </div>
-        <div id="pp-bloco-limite" style="display:none;margin-top:8px;">
-          <div class="mfsec">Refinar quantidade por CATMAT</div>
-          <div id="pp-limites-por-catmat"></div>
-          <button class="bgerar" style="margin-top:8px;width:100%;justify-content:center;" onclick="reaplicarFiltrosPP()">🔄 Reaplicar filtros</button>
-        </div>
       </div>
-
+ 
     </div>
     <div class="mftr">
       <div class="mhint" id="pp-mhint">Busca em dadosabertos.compras.gov.br</div>
       <div class="macts">
         <button class="bcancelar" id="pp-btn-cancelar" onclick="fecharOv('ov-pp')">Cancelar</button>
-        <button class="bgerar" id="pp-btn-acao" onclick="previewPP()">🔍 Visualizar resultados</button>
+        <button class="bgerar"    id="pp-btn-acao"     onclick="previewPP()">🔍 Visualizar resultados</button>
       </div>
     </div>
   </div>
 </div>
-
+ 
 <!-- Modal Homologação -->
 <div class="overlay" id="ov-hom" onclick="fecharOv('ov-hom',event)">
   <div class="modal" onclick="event.stopPropagation()" style="max-width:640px;">
@@ -1364,12 +1358,13 @@ async function abrirProcesso(idx) {
     const full    = await gasCall('lerProcesso', { numProc: resumo.PROCESSO });
     const docsKey   = 'docs_' + resumo.PROCESSO;
     const docsLocal = JSON.parse(localStorage.getItem(docsKey) || '[]');
-    procAtual = {
-      dadosGerais: full.dadosGerais,
-      equipe:      full.equipe  || [],
-      itens:       full.itens   || [],
-      docsGerados: docsLocal
-    };
+procAtual = {
+  dadosGerais: full.dadosGerais,
+  equipe:      full.equipe     || [],
+  itens:       full.itens      || [],
+  criterios:   full.criterios  || {},
+  docsGerados: docsLocal
+};
     document.getElementById('ptitle').textContent = dg().ASSUNTO || resumo.ASSUNTO;
     document.getElementById('psub').textContent   = dg().PROCESSO + ' · ' + dg().INTERESSADO;
     renderSidebar();
@@ -1755,31 +1750,87 @@ function abrirModal142() {
   abrirOv('ov-142');
 }
 
-function abrirModal144() {
+async function abrirModal144() {
   const p = dg();
-  document.getElementById('m144-proc').textContent  = p.PROCESSO + ' · ' + p.INTERESSADO;
+  document.getElementById('m144-proc').textContent   = p.PROCESSO + ' · ' + p.INTERESSADO;
   document.getElementById('m144-r-proc').textContent = p.PROCESSO;
   document.getElementById('m144-r-obj').textContent  = p.ASSUNTO;
   const sel = document.getElementById('m144-pregoeiro');
   sel.value = p.PREGOEIRO || '';
   setBadge('m144-preg-badge', p.PREGOEIRO);
+
+  // N° do Pregão — lido automaticamente
+campoSelect({
+    containerId:  'm144-bloco-npreg',
+    label:        'Nº do Pregão',
+    valor:        p.N_PREGAO,
+    labelValor:   p.N_PREGAO,
+    fonte:        'Checklist · Preenchido na Informação p/ Intaurar Sessão',
+    inputId:      'm144-npreg-inline',
+    tipo:         'texto',
+    placeholder:  'Ex: 001/2026'
+  });
+  // Equipe de Apoio — pré-popula com comprador + Anita se ainda não foi salva
   const eq = procAtual.equipe || [];
-  document.getElementById('m144-equipe-nomes').value = eq.map(m => m.NOME_MEMBRO).join('\n');
-  document.getElementById('m144-equipe-cpfs').value  = eq.map(m => m.CPF).join('\n');
+  if (eq.length > 0) {
+    document.getElementById('m144-equipe-nomes').value = eq.map(m => m.NOME_MEMBRO).join('\n');
+    document.getElementById('m144-equipe-cpfs').value  = eq.map(m => m.CPF).join('\n');
+  } else {
+    try {
+      const r = await gasCall('buscarMembrosDefault', { numProc: p.PROCESSO });
+      const membros = r.membros || [];
+      document.getElementById('m144-equipe-nomes').value = membros.map(m => m.nome).join('\n');
+      document.getElementById('m144-equipe-cpfs').value  = membros.map(m => m.cpf).join('\n');
+    } catch(e) {
+      document.getElementById('m144-equipe-nomes').value = '';
+      document.getElementById('m144-equipe-cpfs').value  = '';
+    }
+  }
+
   abrirOv('ov-144');
 }
 
 function abrirModal148() {
   const p = dg();
-  document.getElementById('m148-proc').textContent  = p.PROCESSO + ' · ' + p.INTERESSADO;
+  document.getElementById('m148-proc').textContent   = p.PROCESSO + ' · ' + p.INTERESSADO;
   document.getElementById('m148-r-proc').textContent = p.PROCESSO;
   document.getElementById('m148-r-obj').textContent  = p.ASSUNTO;
-  document.getElementById('m148-r-preg').textContent  = p.PREGOEIRO || '(não preenchido ainda)';
-  document.getElementById('m148-r-npreg').textContent = p.N_PREGAO  || '(preencha na etapa 14.2)';
-  document.getElementById('m148-npreg').value = p.N_PREGAO || '';
+
+  campoSelect({
+    containerId: 'm148-bloco-preg',
+    label:       'Pregoeiro',
+    valor:       p.PREGOEIRO,
+    labelValor:  p.PREGOEIRO,
+    fonte:       'Ato de Designação · etapa 14.4',
+    inputId:     'm148-preg-inline',
+    opcoes: [
+      { value: 'Ahamed Yanes Abou Chami',                  label: 'Ahamed Yanes Abou Chami' },
+      { value: 'Daniela Vendemiatti',                      label: 'Daniela Vendemiatti' },
+      { value: 'Emanuela Vieira de Mira',                  label: 'Emanuela Vieira de Mira' },
+      { value: 'Fernanda Gisele Segala',                   label: 'Fernanda Gisele Segala' },
+      { value: 'Lilian Patricia Barbosa Maggiotto',        label: 'Lilian Patricia Barbosa Maggiotto' },
+      { value: 'Luis Sergio Bertho',                       label: 'Luis Sergio Bertho' },
+      { value: 'Luzia Aparecida Morais Silva',             label: 'Luzia Aparecida Morais Silva' },
+      { value: 'Maria Julia Ceolin Gioia',                 label: 'Maria Julia Ceolin Gioia' },
+      { value: 'Natalia Assimen de Queiroz',               label: 'Natalia Assimen de Queiroz' },
+      { value: 'Sandra Helena Fantinatti Gonçalves Grillo', label: 'Sandra Helena Fantinatti Gonçalves Grillo' },
+      { value: 'Thiago Mendes Cardoso',                    label: 'Thiago Mendes Cardoso' }
+    ]
+  });
+
+  campoSelect({
+    containerId:  'm148-bloco-npreg',
+    label:        'Nº do Pregão',
+    valor:        p.N_PREGAO,
+    labelValor:   p.N_PREGAO,
+    fonte:        'Informação Instaurar Sessão · etapa 14.2',
+    inputId:      'm148-npreg-inline',
+    tipo:         'texto',
+    placeholder:  'Ex: 001/2026'
+  });
+
   document.getElementById('m148-dpreg').value = isoDate(p.DATA_PREGAO);
   document.getElementById('m148-dpub').value  = isoDate(p.DATA_PUBLICACAO);
-  setBadge('m148-preg-badge', p.N_PREGAO);
   setBadge('m148-data-badge', p.DATA_PREGAO);
   setBadge('m148-pub-badge',  p.DATA_PUBLICACAO);
   validarDatas148();
@@ -1905,30 +1956,127 @@ function validarDatas148() {
     if (btnGerar) btnGerar.disabled = false;
   }
 }
+function atualizarPreview1413() {
+  const p  = dg();
+  const np = p.N_PREGAO   || (document.getElementById('m1413-npreg-inline') || {}).value || '(não preenchido)';
+  const dp = p.DATA_PREGAO || (document.getElementById('m1413-dpreg-inline') || {}).value || '(data não preenchida)';
+  const pr = p.PREGOEIRO  || (document.getElementById('m1413-preg-inline')  || {}).value || '(não definido)';
+  document.getElementById('m1413-preview').innerHTML =
+    `<strong>Para:</strong> supri.materiais\u0040dga.unicamp.br · <strong>Cc:</strong> centralpreg\u0040dga.unicamp.br<br>` +
+    `<strong>Assunto:</strong> AVISO DE ABERTURA PE DGA ${np} — ${p.ASSUNTO}<br><br>` +
+    `Informamos a abertura do PE DGA nº ${np} (${p.ASSUNTO}), ` +
+    `sessão em ${dp}, Pregoeiro(a): ${pr}.`;
+}
+
 function abrirModal1413() {
   const p = dg();
-  if (!p.N_PREGAO) { toast('⚠️','Atenção','Preencha primeiro o 14.8 (Nº Pregão e datas).'); return; }
-  document.getElementById('m1413-proc').textContent   = p.PROCESSO + ' · ' + p.INTERESSADO;
-  document.getElementById('m1413-r-preg').textContent  = p.N_PREGAO || '—';
-  document.getElementById('m1413-r-obj').textContent   = p.ASSUNTO;
-  document.getElementById('m1413-r-dpreg').textContent = p.DATA_PREGAO || '—';
-  document.getElementById('m1413-r-preg2').textContent = p.PREGOEIRO || '—';
-  document.getElementById('m1413-preview').innerHTML   =
-    `<strong>Para:</strong> supri.materiais\u0040dga.unicamp.br · <strong>Cc:</strong> centralpreg\u0040dga.unicamp.br<br>` +
-    `<strong>Assunto:</strong> AVISO DE ABERTURA PE DGA ${p.N_PREGAO} — ${p.ASSUNTO}<br><br>` +
-    `Informamos a abertura do PE DGA nº ${p.N_PREGAO} (${p.ASSUNTO}), ` +
-    `sessão em ${p.DATA_PREGAO||'(data não preenchida)'}, Pregoeiro(a): ${p.PREGOEIRO||'(não definido)'}.`;
+  document.getElementById('m1413-proc').textContent  = p.PROCESSO + ' · ' + p.INTERESSADO;
+  document.getElementById('m1413-r-obj').textContent = p.ASSUNTO;
+
+  campoSelect({
+    containerId:  'm1413-bloco-npreg',
+    label:        'Nº do Pregão',
+    valor:        p.N_PREGAO,
+    labelValor:   p.N_PREGAO,
+    fonte:        'Aviso de Abertura · etapa 14.8',
+    inputId:      'm1413-npreg-inline',
+    tipo:         'texto',
+    placeholder:  'Ex: 001/2026'
+  });
+
+  campoSelect({
+    containerId:  'm1413-bloco-dpreg',
+    label:        'Data do Pregão',
+    valor:        p.DATA_PREGAO,
+    labelValor:   p.DATA_PREGAO,
+    fonte:        'Aviso de Abertura · etapa 14.8',
+    inputId:      'm1413-dpreg-inline',
+    tipo:         'texto',
+    placeholder:  'Ex: 15/05/2026'
+  });
+
+  campoSelect({
+    containerId: 'm1413-bloco-preg',
+    label:       'Pregoeiro',
+    valor:       p.PREGOEIRO,
+    labelValor:  p.PREGOEIRO,
+    fonte:       'Ato de Designação · etapa 14.4',
+    inputId:     'm1413-preg-inline',
+    opcoes: [
+      { value: 'Ahamed Yanes Abou Chami',                   label: 'Ahamed Yanes Abou Chami' },
+      { value: 'Daniela Vendemiatti',                       label: 'Daniela Vendemiatti' },
+      { value: 'Emanuela Vieira de Mira',                   label: 'Emanuela Vieira de Mira' },
+      { value: 'Fernanda Gisele Segala',                    label: 'Fernanda Gisele Segala' },
+      { value: 'Lilian Patricia Barbosa Maggiotto',         label: 'Lilian Patricia Barbosa Maggiotto' },
+      { value: 'Luis Sergio Bertho',                        label: 'Luis Sergio Bertho' },
+      { value: 'Luzia Aparecida Morais Silva',              label: 'Luzia Aparecida Morais Silva' },
+      { value: 'Maria Julia Ceolin Gioia',                  label: 'Maria Julia Ceolin Gioia' },
+      { value: 'Natalia Assimen de Queiroz',                label: 'Natalia Assimen de Queiroz' },
+      { value: 'Sandra Helena Fantinatti Gonçalves Grillo', label: 'Sandra Helena Fantinatti Gonçalves Grillo' },
+      { value: 'Thiago Mendes Cardoso',                     label: 'Thiago Mendes Cardoso' }
+    ]
+  });
+
+  // Atualiza a prévia e conecta os campos inline ao preview em tempo real
+  atualizarPreview1413();
+  ['m1413-npreg-inline','m1413-dpreg-inline','m1413-preg-inline'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', atualizarPreview1413);
+  });
+
   abrirOv('ov-1413');
 }
 
 function abrirModal1414() {
   const p = dg();
-  document.getElementById('m1414-proc').textContent        = p.PROCESSO + ' · ' + p.INTERESSADO;
-  document.getElementById('m1414-r-proc').textContent      = p.PROCESSO;
-  document.getElementById('m1414-r-preg').textContent      = p.N_PREGAO    || '(não preenchido)';
-  document.getElementById('m1414-r-dpreg').textContent     = p.DATA_PREGAO || '(não preenchido)';
-  document.getElementById('m1414-r-pregoeiro').textContent = p.PREGOEIRO   || '(não preenchido)';
-  document.getElementById('m1414-r-obj').textContent       = p.ASSUNTO;
+  document.getElementById('m1414-proc').textContent   = p.PROCESSO + ' · ' + p.INTERESSADO;
+  document.getElementById('m1414-r-proc').textContent = p.PROCESSO;
+  document.getElementById('m1414-r-obj').textContent  = p.ASSUNTO;
+
+  campoSelect({
+    containerId:  'm1414-bloco-npreg',
+    label:        'Nº do Pregão',
+    valor:        p.N_PREGAO,
+    labelValor:   p.N_PREGAO,
+    fonte:        'Aviso de Abertura · etapa 14.8',
+    inputId:      'm1414-npreg-inline',
+    tipo:         'texto',
+    placeholder:  'Ex: 001/2026'
+  });
+
+  campoSelect({
+    containerId:  'm1414-bloco-dpreg',
+    label:        'Data do Pregão',
+    valor:        p.DATA_PREGAO,
+    labelValor:   p.DATA_PREGAO,
+    fonte:        'Aviso de Abertura · etapa 14.8',
+    inputId:      'm1414-dpreg-inline',
+    tipo:         'texto',
+    placeholder:  'Ex: 15/05/2026'
+  });
+
+  campoSelect({
+    containerId: 'm1414-bloco-preg',
+    label:       'Pregoeiro',
+    valor:       p.PREGOEIRO,
+    labelValor:  p.PREGOEIRO,
+    fonte:       'Ato de Designação · etapa 14.4',
+    inputId:     'm1414-preg-inline',
+    opcoes: [
+      { value: 'Ahamed Yanes Abou Chami',                   label: 'Ahamed Yanes Abou Chami' },
+      { value: 'Daniela Vendemiatti',                       label: 'Daniela Vendemiatti' },
+      { value: 'Emanuela Vieira de Mira',                   label: 'Emanuela Vieira de Mira' },
+      { value: 'Fernanda Gisele Segala',                    label: 'Fernanda Gisele Segala' },
+      { value: 'Lilian Patricia Barbosa Maggiotto',         label: 'Lilian Patricia Barbosa Maggiotto' },
+      { value: 'Luis Sergio Bertho',                        label: 'Luis Sergio Bertho' },
+      { value: 'Luzia Aparecida Morais Silva',              label: 'Luzia Aparecida Morais Silva' },
+      { value: 'Maria Julia Ceolin Gioia',                  label: 'Maria Julia Ceolin Gioia' },
+      { value: 'Natalia Assimen de Queiroz',                label: 'Natalia Assimen de Queiroz' },
+      { value: 'Sandra Helena Fantinatti Gonçalves Grillo', label: 'Sandra Helena Fantinatti Gonçalves Grillo' },
+      { value: 'Thiago Mendes Cardoso',                     label: 'Thiago Mendes Cardoso' }
+    ]
+  });
+
   abrirOv('ov-1414');
 }
 
@@ -1957,33 +2105,48 @@ function abrirModalEdital() {
   document.getElementById('ed-r-obj').textContent  = p.ASSUNTO  || '—';
 
   // Critério de julgamento — vem do TR Administrativo salvo
-  const julgMap = {
-    'MN_PRECO_GLOBAL': 'Menor Preço Global',
-    'MN_PRECO_LOTE':   'Menor Preço por Lote',
-    'MN_PRECO_ITEM':   'Menor Preço por Item',
-    'MAIOR_DESC':      'Maior Desconto'
-  };
-  document.getElementById('ed-r-julg').textContent =
-    julgMap[p.JULGAMENTO] || p.JULGAMENTO || '(não preenchido — gerado pelo TR Admin)';
+const crit = (procAtual && procAtual.criterios) || {};
+const julgMap = {
+  'MN_PRECO_GLOBAL': 'Menor Preço Global',
+  'MN_PRECO_LOTE':   'Menor Preço por Lote',
+  'MN_PRECO_ITEM':   'Menor Preço por Item',
+  'MAIOR_DESC':      'Maior Desconto'
+};
+campoSelect({
+  containerId: 'ed-bloco-julg',
+  label:       'Critério de Julgamento',
+  valor:       crit.CRITERIO_JULG,
+  labelValor:  julgMap[crit.CRITERIO_JULG] || crit.CRITERIO_JULG,
+  fonte:       'TR Administrativo',
+  inputId:     'ed-julg-inline',
+  opcoes: [
+    { value: 'MN_PRECO_GLOBAL', label: 'Menor Preço Global' },
+    { value: 'MN_PRECO_LOTE',   label: 'Menor Preço por Lote' },
+    { value: 'MN_PRECO_ITEM',   label: 'Menor Preço por Item' },
+    { value: 'MAIOR_DESC',      label: 'Maior Desconto' }
+  ]
+});
 
-  // Comprador — usa campoChecklist pois pode estar vazio
-  campoChecklist({
-    containerId: 'ed-bloco-comp',
-    label:       'Comprador',
-    valor:       p.COMPRADOR,
-    fonte:       'Tabela 1 · criação do processo',
-    inputId:     'ed-comp-inline',
-    placeholder: 'Ex: Materiais'
-  });
-
-  // Preenche valor estimado e tipo de divulgação salvos anteriormente
-  const elValorTipo = document.getElementById('ed-valor-tipo');
-  const elValorEst  = document.getElementById('ed-valor-estimado');
-  const elValorFe   = document.getElementById('fe-ed-valor-estimado');
-  if (p.VALOR_TIPO) elValorTipo.value = p.VALOR_TIPO;
-  if (p.VALOR_ESTIMADO) elValorEst.value = p.VALOR_ESTIMADO;
-  elValorFe.style.display = (elValorTipo.value === 'VALOR_SIG') ? 'none' : '';
-
+const valorMap = { 'VALOR_ABERTO': 'Tabela Aberta', 'VALOR_ABERTO_DESC': 'Referência c/ Desconto', 'VALOR_SIG': 'Sigiloso' };
+campoSelect({
+  containerId: 'ed-bloco-valor',
+  label:       'Divulgação de Valores',
+  valor:       crit.DIVULG_VALOR,
+  labelValor:  valorMap[crit.DIVULG_VALOR] || crit.DIVULG_VALOR,
+  fonte:       'TR Administrativo',
+  inputId:     'ed-valor-tipo',
+  opcoes: [
+    { value: 'VALOR_ABERTO',      label: 'Tabela Aberta' },
+    { value: 'VALOR_ABERTO_DESC', label: 'Referência c/ Desconto' },
+    { value: 'VALOR_SIG',         label: 'Sigiloso' }
+  ]
+});
+// Valor estimado — exibe abaixo do bloco de valor quando necessário
+const blocoValorEst = document.getElementById('fe-ed-valor-estimado');
+if (blocoValorEst) {
+  const precisaEstimado = (crit.DIVULG_VALOR || v('ed-valor-tipo')) !== 'VALOR_SIG';
+  blocoValorEst.style.display = precisaEstimado ? '' : 'none';
+}
   // Reseta a lógica de participação para o estado inicial
   atualizarParticipacaoEdital();
 
@@ -2127,7 +2290,8 @@ function abrirHom() {
   abrirOv('ov-hom');
 }
 function abrirModalContrato() {
-  const p = dg();
+  const p    = dg();
+  const crit = (procAtual && procAtual.criterios) || {};
   document.getElementById('cont-r-proc').textContent = p.PROCESSO || '—';
   document.getElementById('cont-r-obj').textContent  = p.ASSUNTO  || '—';
   document.getElementById('m-cont-proc').textContent = p.PROCESSO + ' · ' + p.INTERESSADO;
@@ -2139,7 +2303,21 @@ function abrirModalContrato() {
     inputId:     'cont-comp-inline',
     placeholder: 'Ex: Materiais'
   });
-  // Garante estado inicial correto do campo de prazo
+
+  // Garantia Contratual — lida do TR salvo ou editável pelo comprador
+const garMap = { 'SEM_GARANTIA': 'Não Exigida', 'COM_GARANTIA': 'Exigida' };
+campoSelect({
+  containerId: 'cont-bloco-garantia',
+  label:       'Garantia Contratual',
+  valor:       crit.GARANTIA,
+  labelValor:  garMap[crit.GARANTIA] || crit.GARANTIA,
+  fonte:       'TR Administrativo',
+  inputId:     'cont-garantia-inline',
+  opcoes: [
+    { value: 'SEM_GARANTIA', label: 'Não Exigida' },
+    { value: 'COM_GARANTIA', label: 'Exigida' }
+  ]
+});
   document.getElementById('fe-cont-prazo-garant').style.display =
     document.getElementById('cont-tipo-garantia').value === 'EXIG_GAR_MIN' ? '' : 'none';
   abrirOv('ov-contrato');
@@ -2151,12 +2329,21 @@ function contToggleSubtipo() {
 
 async function gerarContrato() {
   const subtipo = document.getElementById('cont-subtipo').value;
-  const payload = {
-    numProc:    dg().PROCESSO,
-    subcon:     document.getElementById('cont-subcon').value,
-    tipoValor:  document.getElementById('cont-valor').value,
-    garantia:   document.getElementById('cont-garantia').value
-  };
+const crit    = (procAtual && procAtual.criterios) || {};
+const garantia = crit.GARANTIA || v('cont-garantia-inline') || '';
+if (!garantia) { alert('Selecione a Garantia Contratual antes de gerar o Contrato.'); return; }
+
+// Salva no banco se veio inline
+if (!crit.GARANTIA && garantia) {
+  gasCall('salvarCriterioInline', { numProc: p.PROCESSO, campos: { GARANTIA: garantia } });
+  procAtual.criterios.GARANTIA = garantia; // atualiza memória local também
+}
+const payload = {
+  numProc:    dg().PROCESSO,
+  subcon:     document.getElementById('cont-subcon').value,
+  tipoValor:  document.getElementById('cont-valor').value,
+  garantia:   garantia
+};
   if (subtipo === 'ESCOPO') {
     payload.pagamento    = document.getElementById('cont-pagamento').value;
     const tipoGar = document.getElementById('cont-tipo-garantia').value;
@@ -2315,47 +2502,111 @@ async function gerar144() {
 }
 
 async function gerar148() {
-  const np = v('m148-npreg'), dp = v('m148-dpreg'), dpub = v('m148-dpub');
-  if (!np || !dp) { alert('Preencha o Nº do Pregão e a Data do Pregão.'); return; }
+  const p    = dg();
+  const np   = p.N_PREGAO   || v('m148-npreg-inline') || '';
+  const preg = p.PREGOEIRO  || v('m148-preg-inline')  || '';
+  const dp   = v('m148-dpreg'), dpub = v('m148-dpub');
+  if (!np)   { alert('Preencha o Nº do Pregão.'); return; }
+  if (!preg) { alert('Selecione o Pregoeiro.'); return; }
+  if (!dp)   { alert('Preencha a Data do Pregão.'); return; }
   const hint = document.getElementById('m148-data-hint');
   if (hint && hint.style.color === 'var(--red)') { alert('A Data do Pregão não respeita o prazo mínimo de 8 dias úteis.'); return; }
   fecharOv('ov-148');
-  mostrarLoading('Gerando 14.8 Aviso de Abertura + e-mail Gibbor…');
+  mostrarLoading('Gerando Aviso de Abertura');
+
+  // Salva no banco os campos preenchidos inline
+  const camposInline = {};
+  if (!p.N_PREGAO  && np)   camposInline.N_PREGAO  = np;
+  if (!p.PREGOEIRO && preg) camposInline.PREGOEIRO = preg;
+  if (Object.keys(camposInline).length > 0) {
+    gasCall('salvarDadoInline', { numProc: p.PROCESSO, campos: camposInline });
+    Object.assign(procAtual.dadosGerais, camposInline);
+  }
+
   try {
-    const r = await gasCall('gerarAvisoAbertura', { numProc: dg().PROCESSO, num_pregao: np, data_pregao: fmtDate(dp), data_pub: fmtDate(dpub) });
+    const r = await gasCall('gerarAvisoAbertura', { numProc: p.PROCESSO, num_pregao: np, pregoeiro: preg, data_pregao: fmtDate(dp), data_pub: fmtDate(dpub) });
     procAtual.dadosGerais.N_PREGAO        = np;
     procAtual.dadosGerais.DATA_PREGAO     = fmtDate(dp);
     procAtual.dadosGerais.DATA_PUBLICACAO = fmtDate(dpub);
     registrarDoc('14.8 Aviso de Abertura');
-    registrarDoc('14.9 E-mail Gibbor');
     renderSidebar();
-    toast('📄', '14.8 gerado + e-mail Gibbor criado!', 'PE ' + np + ' · Sessão ' + fmtDate(dp), true);
+    toast('📄', 'Aviso de Abertura gerado!', 'PE ' + np + ' · Sessão ' + fmtDate(dp), true);
     if (r.docUrl) window.open(r.docUrl, '_blank');
     if (r.draftUrl) setTimeout(() => window.open(r.draftUrl, '_blank'), 800);
   } catch(e) {
-    toast('❌', 'Erro ao gerar 14.8', e.message, false);
+    toast('❌', 'Erro ao gerar Aviso de Abertura', e.message, false);
   }
   ocultarLoading();
 }
 
+function atualizarPreview149() {
+  const p  = dg();
+  const np   = p.N_PREGAO        || (document.getElementById('m149-npreg-inline') || {}).value || '(não preenchido)';
+  const dpub = p.DATA_PUBLICACAO || (document.getElementById('m149-dpub-inline')  || {}).value || '(data não preenchida)';
+  document.getElementById('m149-preview').innerHTML =
+    `<strong>Assunto:</strong> Publicacao para [dia da semana] (GIBBOR) — ${dpub} — Aviso de Abertura PE DGA ${np}<br><br>` +
+    `<strong>Para:</strong> contatogibbor@gmail.com e demais destinatários Gibbor<br>` +
+    `<strong>Cc:</strong> supri.materiais · contratos@gibborbrasil.com.br`;
+}
+
 function abrirModal149() {
   const p = dg();
-  if (!p.N_PREGAO) { toast('⚠️','Atenção','Preencha primeiro o 14.8 (Nº Pregão e datas).'); return; }
-  document.getElementById('m149-proc').textContent    = p.PROCESSO + ' · ' + p.INTERESSADO;
-  document.getElementById('m149-r-preg').textContent  = p.N_PREGAO || '—';
-  document.getElementById('m149-r-obj').textContent   = p.ASSUNTO;
-  document.getElementById('m149-r-dpub').textContent  = p.DATA_PUBLICACAO || '—';
+  document.getElementById('m149-proc').textContent  = p.PROCESSO + ' · ' + p.INTERESSADO;
+  document.getElementById('m149-r-obj').textContent = p.ASSUNTO;
+
+  campoSelect({
+    containerId:  'm149-bloco-npreg',
+    label:        'Nº do Pregão',
+    valor:        p.N_PREGAO,
+    labelValor:   p.N_PREGAO,
+    fonte:        'Aviso de Abertura · etapa 14.8',
+    inputId:      'm149-npreg-inline',
+    tipo:         'texto',
+    placeholder:  'Ex: 001/2026'
+  });
+
+  campoSelect({
+    containerId:  'm149-bloco-dpub',
+    label:        'Data de Publicação',
+    valor:        p.DATA_PUBLICACAO,
+    labelValor:   p.DATA_PUBLICACAO,
+    fonte:        'Aviso de Abertura · etapa 14.8',
+    inputId:      'm149-dpub-inline',
+    tipo:         'texto',
+    placeholder:  'Ex: 10/05/2026'
+  });
+
+  atualizarPreview149();
+  ['m149-npreg-inline', 'm149-dpub-inline'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', atualizarPreview149);
+  });
+
   abrirOv('ov-149');
 }
 
 async function gerar149() {
+  const p    = dg();
+  const np   = p.N_PREGAO        || v('m149-npreg-inline') || '';
+  const dpub = p.DATA_PUBLICACAO || v('m149-dpub-inline')  || '';
+  if (!np)   { alert('Preencha o Nº do Pregão.'); return; }
+  if (!dpub) { alert('Preencha a Data de Publicação.'); return; }
+
+  const camposInline = {};
+  if (!p.N_PREGAO        && np)   camposInline.N_PREGAO        = np;
+  if (!p.DATA_PUBLICACAO && dpub) camposInline.DATA_PUBLICACAO = dpub;
+  if (Object.keys(camposInline).length > 0) {
+    gasCall('salvarDadoInline', { numProc: p.PROCESSO, campos: camposInline });
+    Object.assign(procAtual.dadosGerais, camposInline);
+  }
+
   fecharOv('ov-149');
-  mostrarLoading('Criando rascunho 14.9 E-mail Gibbor…');
+  mostrarLoading('Criando rascunho p/ Gibbor…');
   try {
-    const r = await gasCall('gerarEmailGibbor', { numProc: dg().PROCESSO });
+    const r = await gasCall('gerarEmailGibbor', { numProc: p.PROCESSO });
     registrarDoc('14.9 E-mail Gibbor');
     renderSidebar();
-    toast('✉️', '14.9 — Rascunho Gibbor criado!', 'Para: Gibbor + supri.materiais', true);
+    toast('✉️', 'Rascunho Gibbor criado!', 'Para: Gibbor + supri.materiais', true);
     if (r.url) window.open(r.url, '_blank');
   } catch(e) {
     toast('❌', 'Erro ao criar rascunho', e.message, false);
@@ -2364,10 +2615,27 @@ async function gerar149() {
 }
 
 async function gerar1413() {
+  const p    = dg();
+  const np   = p.N_PREGAO    || v('m1413-npreg-inline') || '';
+  const dp   = p.DATA_PREGAO || v('m1413-dpreg-inline') || '';
+  const preg = p.PREGOEIRO   || v('m1413-preg-inline')  || '';
+  if (!np)   { alert('Preencha o Nº do Pregão.'); return; }
+  if (!dp)   { alert('Preencha a Data do Pregão.'); return; }
+  if (!preg) { alert('Selecione o Pregoeiro.'); return; }
+
+  const camposInline = {};
+  if (!p.N_PREGAO    && np)   camposInline.N_PREGAO    = np;
+  if (!p.DATA_PREGAO && dp)   camposInline.DATA_PREGAO = dp;
+  if (!p.PREGOEIRO   && preg) camposInline.PREGOEIRO   = preg;
+  if (Object.keys(camposInline).length > 0) {
+    gasCall('salvarDadoInline', { numProc: p.PROCESSO, campos: camposInline });
+    Object.assign(procAtual.dadosGerais, camposInline);
+  }
+
   fecharOv('ov-1413');
   mostrarLoading('Criando rascunho 14.13…');
   try {
-    const r = await gasCall('gerarEmailInteressados', { numProc: dg().PROCESSO });
+    const r = await gasCall('gerarEmailInteressados', { numProc: p.PROCESSO });
     registrarDoc('14.13 E-mail Abertura Interessados');
     renderSidebar();
     toast('✉️', '14.13 — Rascunho criado no Gmail!', 'Para: supri.materiais · Cc: centralpreg', true);
@@ -2379,11 +2647,28 @@ async function gerar1413() {
 }
 
 async function gerar1414() {
-  if (!dg().N_PREGAO) { alert('Preencha primeiro o Nº do Pregão (14.8).'); return; }
+  const p    = dg();
+  const np   = p.N_PREGAO   || v('m1414-npreg-inline') || '';
+  const dp   = p.DATA_PREGAO || v('m1414-dpreg-inline') || '';
+  const preg = p.PREGOEIRO  || v('m1414-preg-inline')  || '';
+  if (!np)   { alert('Preencha o Nº do Pregão.'); return; }
+  if (!dp)   { alert('Preencha a Data do Pregão.'); return; }
+  if (!preg) { alert('Selecione o Pregoeiro.'); return; }
+
+  // Salva no banco os campos preenchidos inline
+  const camposInline = {};
+  if (!p.N_PREGAO    && np)   camposInline.N_PREGAO    = np;
+  if (!p.DATA_PREGAO && dp)   camposInline.DATA_PREGAO = dp;
+  if (!p.PREGOEIRO   && preg) camposInline.PREGOEIRO   = preg;
+  if (Object.keys(camposInline).length > 0) {
+    gasCall('salvarDadoInline', { numProc: p.PROCESSO, campos: camposInline });
+    Object.assign(procAtual.dadosGerais, camposInline);
+  }
+
   fecharOv('ov-1414');
   mostrarLoading('Gerando 14.14 Despacho Central…');
   try {
-    const r = await gasCall('gerarDespachoCentral', { numProc: dg().PROCESSO });
+    const r = await gasCall('gerarDespachoCentral', { numProc: p.PROCESSO });
     registrarDoc('14.14 Despacho Central de Pregão');
     renderSidebar();
     toast('📄', '14.14 gerado!', 'Despacho para Central de Pregão', true);
@@ -2411,8 +2696,22 @@ async function gerar151() {
   ocultarLoading();
 }
 
-let ppItensPreview = [];
 
+let ppItensPreview   = [];   // resultados PNCP vindos do backend
+let ppCotacoesManual = {};   // { catmat: [ {fornecedor,cnpj,preco,unidade,observacao} ] }
+let ppSelecionados   = {};   // { catmat: Set de índices selecionados }
+
+// ─── Extrai linkPNCP do pncpId caso venha vazio do backend ────
+function _parsearLinkPNCP(pncpId) {
+  if (!pncpId) return '';
+  try {
+    // Formato: "46068425000133-1-000444/2026"
+    const partes = pncpId.replace('-1-', '|').replace('/', '|').split('|');
+    return 'https://pncp.gov.br/app/editais/' + partes[0] + '/' + partes[2] + '/' + parseInt(partes[1]);
+  } catch(e) { return ''; }
+}
+ 
+// ─── Passo 1→2: busca resultados e renderiza curadoria ────────
 async function previewPP() {
   if (!procAtual.itens.length) { alert('Adicione pelo menos um item.'); return; }
   const btn = document.getElementById('pp-btn-acao');
@@ -2420,76 +2719,366 @@ async function previewPP() {
   try {
     await gasCall('salvarItens', { numProc: dg().PROCESSO, itens: procAtual.itens.map(mapItem) });
     const r = await gasCall('previewPesquisaPrecos', { numProc: dg().PROCESSO, limite: 0 });
-    console.log('previewPP resposta:', JSON.stringify(r));
-    ppItensPreview = r.itens || [];
-    window._ppUltimoResumo = r.resumo || [];
-        // Monta resumo
-    let resumoHtml = '<div class="mfsec">Resultado da busca</div>';
-    (r.resumo || []).forEach(function(res) {
-      const cor = res.total === 0 ? 'var(--red)' : 'var(--green)';
-      const labelTotal = res.parcial ? res.total + '+ (pode haver mais)' : 'de ' + res.total + ' total';
-      resumoHtml += `<div style="display:flex;justify-content:space-between;align-items:center;
-        padding:8px 12px;border-radius:7px;background:var(--gray1);border:1px solid var(--border);
-        margin-bottom:6px;font-size:12px;">
-        <div>
-          <span style="font-family:monospace;font-weight:700;color:var(--dark);">CATMAT ${res.catmat}</span>
-          <div style="color:var(--gray4);font-size:11px;margin-top:2px;">${(res.descItem||'').substring(0,60)}${res.descItem && res.descItem.length > 60 ? '…' : ''}</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0;margin-left:12px;">
-          <div style="font-weight:700;color:${cor};font-size:14px;">${res.exibindo}</div>
-          <div style="font-size:10px;color:var(--gray4);">${labelTotal}</div>
-        </div>
-      </div>`;
+ 
+    ppItensPreview   = r.itens || [];
+    ppCotacoesManual = {};
+    ppSelecionados   = {};
+ 
+    // Garante linkPNCP em todos os itens (segurança caso backend envie vazio)
+    ppItensPreview.forEach(function(it) {
+      if (!it.linkPNCP && it.pncpId) it.linkPNCP = _parsearLinkPNCP(it.pncpId);
     });
-    if (r.total > 0) {
-      resumoHtml += `<div style="padding:10px 14px;border-radius:8px;background:#e8f5e9;
-        border:1px solid #c8e6c9;font-size:13px;color:#1b5e20;font-weight:600;margin-top:4px;">
-        ✅ ${r.total} resultado(s) encontrado(s) — prontos para gerar a planilha.
-      </div>`;
+ 
+    // Inicializa seleção: todos marcados por padrão
+    ppItensPreview.forEach(function(it, idx) {
+      const c = String(it.catmat || '');
+      if (!ppSelecionados[c]) ppSelecionados[c] = new Set();
+      ppSelecionados[c].add(idx);
+    });
+ 
+    if (r.total === 0) {
+      document.getElementById('pp-preview-aviso-zero').style.display = '';
+      document.getElementById('pp-curadoria-container').innerHTML    = '';
+    } else {
+      document.getElementById('pp-preview-aviso-zero').style.display = 'none';
+      _renderCuradoria();
     }
-
-    document.getElementById('pp-preview-resumo').innerHTML = resumoHtml;
-    document.getElementById('pp-preview-aviso-zero').style.display = r.total === 0 ? '' : 'none';
-    document.getElementById('pp-bloco-limite').style.display        = r.total > 0  ? '' : 'none';
-
-    if (r.total > 0) {
-      let limitesHtml = '';
-      (r.resumo || []).forEach(function(res) {
-        limitesHtml += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;padding:8px 12px;
-          border-radius:7px;background:var(--gray1);border:1px solid var(--border);">
-          <span style="font-family:monospace;font-weight:700;font-size:12px;flex:1;">CATMAT ${res.catmat}</span>
-          <select id="pp-limite-${res.catmat}" style="width:180px;padding:6px 8px;border:1px solid var(--border);
-            border-radius:6px;font-size:12px;font-family:inherit;">
-            <option value="0">Todos (${res.total})</option>
-            <option value="5">5 mais recentes</option>
-            <option value="10">10 mais recentes</option>
-            <option value="15">15 mais recentes</option>
-            <option value="20">20 mais recentes</option>
-          </select>
-        </div>`;
-      });
-      document.getElementById('pp-limites-por-catmat').innerHTML = limitesHtml;
-    }
+ 
     document.getElementById('pp-passo1').style.display = 'none';
     document.getElementById('pp-passo2').style.display = '';
     document.getElementById('pp-mhint').textContent    = r.total + ' resultado(s) encontrado(s)';
-
+ 
     const btnAcao = document.getElementById('pp-btn-acao');
-    if (r.total > 0) {
-      btnAcao.textContent = '📊 Gerar planilha';
-      btnAcao.onclick     = confirmarGerarPP;
-    } else {
-      btnAcao.textContent = '← Voltar e ajustar';
-      btnAcao.onclick     = voltarConfigPP;
-    }
+    btnAcao.textContent = '📊 Gerar planilha';
+    btnAcao.onclick     = confirmarGerarPP;
     document.getElementById('pp-btn-cancelar').textContent = '← Voltar';
     document.getElementById('pp-btn-cancelar').onclick     = voltarConfigPP;
+ 
   } catch(e) {
     toast('❌', 'Erro na visualização', e.message, false);
   }
   setLoading(btn, false, '🔍 Visualizar resultados');
 }
-
+ 
+// ─── Renderiza curadoria completa ─────────────────────────────
+const PP_LIMITE_INICIAL = 10; // exibe 10 mais recentes por padrão
+ 
+function _renderCuradoria() {
+  const grupos = {};
+  const ordem  = [];
+  ppItensPreview.forEach(function(it, idx) {
+    const c = String(it.catmat || '');
+    if (!grupos[c]) { grupos[c] = []; ordem.push(c); }
+    grupos[c].push({ it, idx });
+  });
+ 
+  let html = '';
+  ordem.forEach(function(catmat) {
+    const items = grupos[catmat];
+    if (!ppCotacoesManual[catmat]) ppCotacoesManual[catmat] = [];
+    const total    = items.length;
+    const exibindo = Math.min(total, PP_LIMITE_INICIAL);
+    const temMais  = total > PP_LIMITE_INICIAL;
+ 
+    html += `
+    <div style="margin-bottom:20px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+ 
+      <!-- Cabeçalho CATMAT -->
+      <div style="background:#2B2B2B;color:#fff;padding:10px 14px;font-weight:700;font-size:13px;
+                  display:flex;justify-content:space-between;align-items:center;">
+        <span>CATMAT ${catmat}</span>
+        <span style="font-size:11px;font-weight:400;opacity:.7;">${total} contratação(ões) encontrada(s) no período</span>
+      </div>
+ 
+      <!-- Tabela -->
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="background:var(--gray1);">
+              <th style="padding:7px 8px;border-bottom:1px solid var(--border);width:32px;">
+                <!-- Selecionar todas -->
+                <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
+                  <input type="checkbox" id="pp-chk-all-${catmat}"
+                    onchange="ppToggleTodos('${catmat}',this.checked)"
+                    checked title="Selecionar todas"/>
+                  <button onclick="ppToggleTodos('${catmat}',false)"
+                    style="font-size:9px;background:none;border:none;cursor:pointer;
+                           color:var(--red);padding:0;line-height:1;" title="Desmarcar todas">✕all</button>
+                </div>
+              </th>
+              <th style="padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);">Órgão</th>
+              <th style="padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);">Descrição</th>
+              <th style="padding:7px 8px;text-align:right;border-bottom:1px solid var(--border);">Qtd</th>
+              <th style="padding:7px 8px;text-align:left;border-bottom:1px solid var(--border);">Un</th>
+              <th style="padding:7px 8px;text-align:right;border-bottom:1px solid var(--border);">Preço Unit.</th>
+              <th style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--border);">Data</th>
+              <th style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--border);">Links</th>
+            </tr>
+          </thead>
+          <tbody id="pp-tbody-${catmat}">`;
+ 
+    // Exibe as 10 primeiras
+    items.slice(0, exibindo).forEach(function(entry) {
+      html += _renderLinhaItem(entry, catmat);
+    });
+ 
+    html += `
+          </tbody>
+        </table>
+      </div>`;
+ 
+    // Botão "Ver mais" se houver mais de 10
+    if (temMais) {
+      html += `
+      <div id="pp-vermais-${catmat}" style="text-align:center;padding:8px;">
+        <button onclick="ppVerMais('${catmat}')"
+          style="background:none;border:1px solid var(--blue);border-radius:6px;
+                 color:var(--blue);font-size:12px;font-weight:600;padding:6px 18px;
+                 cursor:pointer;font-family:inherit;">
+          ▼ Ver mais ${total - exibindo} contratação(ões)
+        </button>
+      </div>`;
+    }
+ 
+    // Estatísticas ao vivo
+    html += `
+      <div id="pp-stats-${catmat}" style="display:flex;gap:16px;padding:10px 14px;
+           background:#f9f9f9;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center;"></div>
+ 
+      <!-- Cotações manuais -->
+      <div style="padding:10px 14px;border-top:1px solid var(--border);background:#fffde7;">
+        <div style="font-size:11px;font-weight:700;color:#e65100;margin-bottom:8px;
+                    letter-spacing:.8px;text-transform:uppercase;">
+          ➕ Adicionar cotação manual
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 140px 110px 80px 1fr 32px;gap:6px;align-items:end;">
+          <div><label style="font-size:10px;color:var(--gray4);">Fornecedor</label>
+               <input id="pp-man-forn-${catmat}" placeholder="Nome do fornecedor"
+                 style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;"/></div>
+          <div><label style="font-size:10px;color:var(--gray4);">CNPJ</label>
+               <input id="pp-man-cnpj-${catmat}" placeholder="00.000.000/0001-00"
+                 style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;"/></div>
+          <div><label style="font-size:10px;color:var(--gray4);">Preço Unit.</label>
+               <input id="pp-man-preco-${catmat}" type="number" step="0.01" placeholder="0,00"
+                 oninput="ppAtualizarEstatisticas('${catmat}')"
+                 style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;"/></div>
+          <div><label style="font-size:10px;color:var(--gray4);">Un.</label>
+               <input id="pp-man-un-${catmat}" placeholder="PAR"
+                 style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;"/></div>
+          <div><label style="font-size:10px;color:var(--gray4);">Observação</label>
+               <input id="pp-man-obs-${catmat}" placeholder="Ex: Proposta via e-mail"
+                 style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;"/></div>
+          <div><button onclick="ppAdicionarManual('${catmat}')"
+               style="width:32px;height:32px;background:var(--red);color:#fff;border:none;
+                      border-radius:5px;font-size:16px;cursor:pointer;display:flex;align-items:center;
+                      justify-content:center;" title="Adicionar">+</button></div>
+        </div>
+        <div id="pp-man-lista-${catmat}" style="margin-top:8px;display:flex;flex-direction:column;gap:4px;"></div>
+      </div>
+ 
+    </div>`;
+  });
+ 
+  document.getElementById('pp-curadoria-container').innerHTML = html;
+  ordem.forEach(function(c) { ppAtualizarEstatisticas(c); });
+}
+ 
+// ─── Renderiza uma linha da tabela de itens ────────────────────
+function _renderLinhaItem(entry, catmat) {
+  const it  = entry.it;
+  const idx = entry.idx;
+  const preco = parseFloat(it.preco || 0).toLocaleString('pt-BR',{minimumFractionDigits:4,maximumFractionDigits:4});
+ 
+  // Garante link PNCP mesmo que venha vazio
+  const linkPncp = it.linkPNCP || _parsearLinkPNCP(it.pncpId);
+  const linkCnet = it.linkComprasNet || '';
+ 
+  const btnPNCP = linkPncp
+    ? `<a href="${linkPncp}" target="_blank" style="color:var(--blue);text-decoration:none;font-weight:600;" title="Abrir no PNCP">🏛</a>`
+    : '';
+  const btnCnet = linkCnet
+    ? `<a href="${linkCnet}" target="_blank" style="color:var(--blue);text-decoration:none;font-weight:600;margin-left:6px;" title="Abrir no Compras.gov">🛒</a>`
+    : '';
+ 
+  const orgao = (it.orgao || it.fornecedor || '');
+  const desc  = (it.descricao || '');
+ 
+  return `
+    <tr id="pp-row-${idx}">
+      <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;">
+        <input type="checkbox" class="pp-chk-item" data-catmat="${catmat}" data-idx="${idx}"
+          onchange="ppAtualizarSelecao('${catmat}')" checked/>
+      </td>
+      <td style="padding:6px 10px;border-bottom:1px solid var(--border);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${orgao}">${orgao.substring(0,35)}${orgao.length>35?'…':''}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid var(--border);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${desc}">${desc.substring(0,40)}${desc.length>40?'…':''}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;font-family:monospace;">${it.qtd||'—'}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid var(--border);">${it.unidade||it.un||'—'}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;font-family:monospace;font-weight:700;">R$ ${preco}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;font-family:monospace;font-size:11px;">${(it.data||'').substring(0,10)}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;">${btnPNCP}${btnCnet}</td>
+    </tr>`;
+}
+ 
+// ─── Expande para mostrar todas as contratações do CATMAT ──────
+function ppVerMais(catmat) {
+  // Encontra os itens não exibidos ainda
+  const tbody = document.getElementById('pp-tbody-' + catmat);
+  if (!tbody) return;
+  const jaExibidos = tbody.querySelectorAll('tr').length;
+ 
+  let htmlExtra = '';
+  let count = 0;
+  ppItensPreview.forEach(function(it, idx) {
+    if (String(it.catmat||'') !== catmat) return;
+    count++;
+    if (count <= jaExibidos) return; // pula os já exibidos
+    htmlExtra += _renderLinhaItem({ it, idx }, catmat);
+  });
+ 
+  tbody.insertAdjacentHTML('beforeend', htmlExtra);
+ 
+  // Remove o botão "Ver mais"
+  const btnVer = document.getElementById('pp-vermais-' + catmat);
+  if (btnVer) btnVer.remove();
+ 
+  // Recalcula seleção e estatísticas
+  ppAtualizarSelecao(catmat);
+}
+ 
+// ─── Toggle selecionar/desmarcar todas ────────────────────────
+function ppToggleTodos(catmat, marcado) {
+  document.querySelectorAll(`.pp-chk-item[data-catmat="${catmat}"]`).forEach(function(chk) {
+    chk.checked = marcado;
+  });
+  // Atualiza o checkbox "selecionar todas"
+  const chkAll = document.getElementById('pp-chk-all-' + catmat);
+  if (chkAll) chkAll.checked = marcado;
+  ppAtualizarSelecao(catmat);
+}
+ 
+// ─── Atualiza seleção e recalcula estatísticas ─────────────────
+function ppAtualizarSelecao(catmat) {
+  if (!ppSelecionados[catmat]) ppSelecionados[catmat] = new Set();
+  ppSelecionados[catmat].clear();
+  document.querySelectorAll(`.pp-chk-item[data-catmat="${catmat}"]`).forEach(function(chk) {
+    if (chk.checked) ppSelecionados[catmat].add(parseInt(chk.dataset.idx));
+  });
+ 
+  const total = document.querySelectorAll(`.pp-chk-item[data-catmat="${catmat}"]`).length;
+  const sel   = ppSelecionados[catmat].size;
+  const chkAll = document.getElementById('pp-chk-all-' + catmat);
+  if (chkAll) chkAll.checked = (sel === total && total > 0);
+ 
+  ppAtualizarEstatisticas(catmat);
+}
+ 
+// ─── Calcula média, mediana e CV ao vivo ──────────────────────
+function ppAtualizarEstatisticas(catmat) {
+  const precos = [];
+ 
+  ppItensPreview.forEach(function(it, idx) {
+    if (String(it.catmat||'') !== catmat) return;
+    if (ppSelecionados[catmat] && ppSelecionados[catmat].has(idx)) {
+      const v = parseFloat(it.preco||0);
+      if (v > 0) precos.push(v);
+    }
+  });
+ 
+  const precoManInput = document.getElementById('pp-man-preco-' + catmat);
+  if (precoManInput && parseFloat(precoManInput.value||0) > 0)
+    precos.push(parseFloat(precoManInput.value));
+ 
+  (ppCotacoesManual[catmat]||[]).forEach(function(ct) {
+    const v = parseFloat(ct.preco||0);
+    if (v > 0) precos.push(v);
+  });
+ 
+  const el = document.getElementById('pp-stats-' + catmat);
+  if (!el) return;
+ 
+  if (precos.length === 0) {
+    el.innerHTML = '<span style="font-size:12px;color:var(--gray4);">Nenhum item selecionado.</span>';
+    return;
+  }
+ 
+  const media   = precos.reduce(function(a,b){return a+b;},0) / precos.length;
+  const sorted  = precos.slice().sort(function(a,b){return a-b;});
+  const mid     = Math.floor(sorted.length/2);
+  const mediana = sorted.length%2!==0 ? sorted[mid] : (sorted[mid-1]+sorted[mid])/2;
+  const desvio  = Math.sqrt(precos.reduce(function(acc,v){return acc+Math.pow(v-media,2);},0)/precos.length);
+  const cv      = media > 0 ? (desvio/media)*100 : 0;
+  const cvCor   = cv <= 25 ? '#2e7d32' : '#c62828';
+  const cvBg    = cv <= 25 ? '#e8f5e9' : '#fdecea';
+  const cvDica  = cv <= 25 ? '✅ CV ≤ 25% — use a Média' : '⚠️ CV > 25% — use a Mediana';
+ 
+  const fmt = function(v) {
+    return 'R$ ' + v.toLocaleString('pt-BR',{minimumFractionDigits:4,maximumFractionDigits:4});
+  };
+ 
+  el.innerHTML = `
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+      <div style="padding:6px 12px;border-radius:6px;background:#e3f2fd;border:1px solid #bbdefb;">
+        <div style="font-size:9px;color:#1565c0;letter-spacing:.8px;text-transform:uppercase;font-weight:700;">Média</div>
+        <div style="font-size:14px;font-weight:700;color:#1565c0;font-family:monospace;">${fmt(media)}</div>
+      </div>
+      <div style="padding:6px 12px;border-radius:6px;background:#f3e5f5;border:1px solid #e1bee7;">
+        <div style="font-size:9px;color:#6a1b9a;letter-spacing:.8px;text-transform:uppercase;font-weight:700;">Mediana</div>
+        <div style="font-size:14px;font-weight:700;color:#6a1b9a;font-family:monospace;">${fmt(mediana)}</div>
+      </div>
+      <div style="padding:6px 12px;border-radius:6px;background:${cvBg};border:1px solid ${cvCor}40;">
+        <div style="font-size:9px;color:${cvCor};letter-spacing:.8px;text-transform:uppercase;font-weight:700;">CV (%)</div>
+        <div style="font-size:14px;font-weight:700;color:${cvCor};font-family:monospace;">${cv.toFixed(1)}%</div>
+      </div>
+      <div style="font-size:11px;color:${cvCor};font-weight:600;padding:4px 10px;border-radius:5px;background:${cvBg};">${cvDica}</div>
+      <div style="font-size:11px;color:var(--gray4);margin-left:auto;">${precos.length} amostra(s)</div>
+    </div>`;
+}
+ 
+// ─── Adiciona cotação manual ───────────────────────────────────
+function ppAdicionarManual(catmat) {
+  const forn  = (document.getElementById('pp-man-forn-'  + catmat)||{}).value || '';
+  const cnpj  = (document.getElementById('pp-man-cnpj-'  + catmat)||{}).value || '';
+  const preco = parseFloat((document.getElementById('pp-man-preco-' + catmat)||{}).value||0);
+  const un    = (document.getElementById('pp-man-un-'    + catmat)||{}).value || '';
+  const obs   = (document.getElementById('pp-man-obs-'   + catmat)||{}).value || '';
+ 
+  if (!forn || preco <= 0) {
+    alert('Preencha ao menos o Fornecedor e o Preço para adicionar uma cotação manual.');
+    return;
+  }
+ 
+  if (!ppCotacoesManual[catmat]) ppCotacoesManual[catmat] = [];
+  const novo = { catmat, fornecedor: forn, cnpj, preco, unidade: un, observacao: obs };
+  ppCotacoesManual[catmat].push(novo);
+ 
+  const lista = document.getElementById('pp-man-lista-' + catmat);
+  if (lista) {
+    const divItem = document.createElement('div');
+    divItem.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 10px;background:#fff;border:1px solid var(--border);border-radius:6px;font-size:12px;';
+    const idx = ppCotacoesManual[catmat].length - 1;
+    divItem.innerHTML = `
+      <span style="flex:1;"><strong>${forn}</strong>${cnpj?' · '+cnpj:''}</span>
+      <span style="font-family:monospace;font-weight:700;color:var(--dark);">R$ ${preco.toLocaleString('pt-BR',{minimumFractionDigits:4,maximumFractionDigits:4})}</span>
+      <span style="color:var(--gray4);">${un||''}</span>
+      <button onclick="ppRemoverManual('${catmat}',${idx},this.parentElement)"
+        style="background:none;border:none;cursor:pointer;color:var(--red);font-size:14px;padding:0 4px;" title="Remover">✕</button>`;
+    lista.appendChild(divItem);
+  }
+ 
+  ['pp-man-forn-','pp-man-cnpj-','pp-man-preco-','pp-man-un-','pp-man-obs-'].forEach(function(id) {
+    const el = document.getElementById(id + catmat);
+    if (el) el.value = '';
+  });
+  ppAtualizarEstatisticas(catmat);
+}
+ 
+function ppRemoverManual(catmat, idx, elDiv) {
+  if (ppCotacoesManual[catmat]) ppCotacoesManual[catmat].splice(idx, 1);
+  if (elDiv) elDiv.remove();
+  ppAtualizarEstatisticas(catmat);
+}
+ 
+// ─── Volta ao passo 1 ─────────────────────────────────────────
 function voltarConfigPP() {
   document.getElementById('pp-passo1').style.display = '';
   document.getElementById('pp-passo2').style.display = 'none';
@@ -2500,68 +3089,61 @@ function voltarConfigPP() {
   const btnCancelar = document.getElementById('pp-btn-cancelar');
   btnCancelar.textContent = 'Cancelar';
   btnCancelar.onclick     = () => fecharOv('ov-pp');
+  ppItensPreview   = [];
+  ppCotacoesManual = {};
+  ppSelecionados   = {};
 }
-
-function getLimitesPorCatmat(resumo) {
-  const limites = {};
-  (resumo || []).forEach(function(res) {
-    const el = document.getElementById('pp-limite-' + res.catmat);
-    limites[res.catmat] = el ? (parseInt(el.value) || 0) : 0;
-  });
-  return limites;
-}
-
-async function reaplicarFiltrosPP() {
-  const resumoAtual = window._ppUltimoResumo || [];
-  if (!resumoAtual.length) return;
-  const limites = getLimitesPorCatmat(resumoAtual);
-  mostrarLoading('Reaplicando filtros…');
-  try {
-    const r = await gasCall('previewPesquisaPrecos', { numProc: dg().PROCESSO, limitesPorCatmat: limites });
-    ppItensPreview = r.itens || [];
-    window._ppUltimoResumo = r.resumo || [];
-    let resumoHtml = '<div class="mfsec">Resultado da busca</div>';
-    (r.resumo || []).forEach(function(res) {
-      const cor = res.total === 0 ? 'var(--red)' : 'var(--green)';
-      const labelTotal = res.parcial ? res.total + '+ (pode haver mais)' : 'de ' + res.total + ' total';
-      resumoHtml += `<div style="display:flex;justify-content:space-between;align-items:center;
-        padding:8px 12px;border-radius:7px;background:var(--gray1);border:1px solid var(--border);
-        margin-bottom:6px;font-size:12px;">
-        <div>
-          <span style="font-family:monospace;font-weight:700;color:var(--dark);">CATMAT ${res.catmat}</span>
-        </div>
-        <div style="text-align:right;flex-shrink:0;margin-left:12px;">
-          <div style="font-weight:700;color:${cor};font-size:14px;">${res.exibindo}</div>
-          <div style="font-size:10px;color:var(--gray4);">${labelTotal}</div>
-        </div>
-      </div>`;
-    });
-    if (r.total > 0) {
-      resumoHtml += `<div style="padding:10px 14px;border-radius:8px;background:#e8f5e9;
-        border:1px solid #c8e6c9;font-size:13px;color:#1b5e20;font-weight:600;margin-top:4px;">
-        ✅ ${r.total} resultado(s) selecionado(s) — prontos para gerar a planilha.
-      </div>`;
-    }
-    document.getElementById('pp-preview-resumo').innerHTML = resumoHtml;
-    document.getElementById('pp-mhint').textContent = r.total + ' resultado(s) selecionado(s)';
-  } catch(e) {
-    toast('❌', 'Erro ao reaplicar filtros', e.message, false);
-  }
-  ocultarLoading();
-}
-
+ 
+// ─── Confirma e gera planilha ─────────────────────────────────
 async function confirmarGerarPP() {
   fecharOv('ov-pp');
   mostrarLoading('Gerando planilha de pesquisa de preços…');
   try {
-    console.log('gerarPlanilhaPesquisa payload: numProc=' + dg().PROCESSO + ' itens=' + ppItensPreview.length);
-    const r = await gasCall('gerarPlanilhaPesquisa', { numProc: dg().PROCESSO, itens: ppItensPreview });
-    console.log('gerarPlanilhaPesquisa resposta:', JSON.stringify(r));
+    const itensSelecionados = ppItensPreview.filter(function(it, idx) {
+      const c = String(it.catmat||'');
+      return ppSelecionados[c] && ppSelecionados[c].has(idx);
+    });
+ 
+    const todasManuals = [];
+    Object.keys(ppCotacoesManual).forEach(function(catmat) {
+      (ppCotacoesManual[catmat]||[]).forEach(function(ct) { todasManuals.push(ct); });
+    });
+ 
+    const todosPrecos = itensSelecionados.map(function(it){ return parseFloat(it.preco||0); })
+      .concat(todasManuals.map(function(ct){ return parseFloat(ct.preco||0); }))
+      .filter(function(v){ return v > 0; });
+ 
+    let media = 0, mediana = 0, cv = 0;
+    if (todosPrecos.length > 0) {
+      media = todosPrecos.reduce(function(a,b){return a+b;},0) / todosPrecos.length;
+      const s = todosPrecos.slice().sort(function(a,b){return a-b;});
+      const m = Math.floor(s.length/2);
+      mediana = s.length%2!==0 ? s[m] : (s[m-1]+s[m])/2;
+      const desvio = Math.sqrt(todosPrecos.reduce(function(acc,v){return acc+Math.pow(v-media,2);},0)/todosPrecos.length);
+      cv = media > 0 ? parseFloat((desvio/media*100).toFixed(2)) : 0;
+    }
+ 
+    const payload = {
+      numProc:         dg().PROCESSO,
+      itensPNCP:       itensSelecionados,
+      cotacoesManuals: todasManuals,
+      calculoFinal: {
+        media:         parseFloat(media.toFixed(4)),
+        mediana:       parseFloat(mediana.toFixed(4)),
+        cv:            cv,
+        totalAmostras: todosPrecos.length
+      }
+    };
+ 
+    const r = await gasCall('gerarPlanilhaPesquisa', payload);
     if (!r.ok) throw new Error(r.erro || 'Erro desconhecido no backend');
+ 
     registrarDoc('7. Pesquisa de Preços (CATMAT)');
     renderSidebar();
-    toast('📊', 'Planilha gerada!', ppItensPreview.length + ' resultado(s) adicionado(s).', true);
+    toast('📊', 'Planilha gerada!',
+      itensSelecionados.length + ' PNCP + ' + todasManuals.length + ' manual(is).', true);
     if (r.url) window.open(r.url, '_blank');
+ 
   } catch(e) {
     console.error('Erro confirmarGerarPP:', e);
     toast('❌', 'Erro ao gerar planilha', e.message, false);
@@ -2569,6 +3151,7 @@ async function confirmarGerarPP() {
   ocultarLoading();
 }
 
+ 
 async function gerarPP() {
   // mantida por compatibilidade — redireciona para o novo fluxo
   previewPP();
@@ -2869,6 +3452,38 @@ function campoChecklist(cfg) {
       '</div></div>';
   }
 }
+function campoSelect(cfg) {
+  // cfg: { containerId, label, valor, labelValor, fonte, inputId, opcoes, inputStyle }
+  // opcoes: [{ value: 'COM_GARANTIA', label: 'Exigida' }, ...]
+  var container = document.getElementById(cfg.containerId);
+  if (!container) return;
+
+  if (cfg.valor) {
+    container.innerHTML =
+      '<div class="fro"><span class="fri">✓</span><div>' +
+      '<div class="frl">' + cfg.label + '</div>' +
+      '<div class="frv">' + (cfg.labelValor || cfg.valor) + '</div>' +
+      '<div class="frs">← ' + cfg.fonte + '</div>' +
+      '</div></div>';
+  } else {
+var opcoesHtml = '<option value="">— Selecione —</option>' +
+  (cfg.opcoes || []).map(function(o) {
+    return '<option value="' + o.value + '">' + o.label + '</option>';
+  }).join('');
+      var inputHtml = cfg.tipo === 'texto'
+      ? '<input id="' + cfg.inputId + '" type="text" placeholder="' + (cfg.placeholder || '') + '" style="border-color:#ffb300;' + (cfg.inputStyle||'') + '"/>'
+      : '<select id="' + cfg.inputId + '" style="border-color:#ffb300;' + (cfg.inputStyle||'') + '">' + opcoesHtml + '</select>';
+    container.innerHTML =
+      '<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;' +
+      'padding:9px 12px;margin-bottom:4px;">' +
+      '<div style="font-size:10px;font-weight:700;color:#795548;margin-bottom:6px;">' +
+      '⚠️ ' + cfg.label + ' não preenchido — ' + (cfg.tipo === 'texto' ? 'preencha abaixo' : 'selecione abaixo') + ' ou conclua a etapa anterior primeiro' +
+      '</div>' +
+      '<div class="fe" style="margin:0;">' +
+      inputHtml +
+      '</div></div>';
+  }
+}
 
 function fecharToast() { document.getElementById('toast').classList.remove('v'); }
 // --- GERAÇÃO TR ADMINISTRATIVO ---
@@ -2954,17 +3569,33 @@ async function gerarEdital() {
   try {
     const isAquisicaoEd = (p.TIPO_CONTRATACAO || '') === 'Aquisicao';
     const comprador  = p.COMPRADOR || v('ed-comp-inline') || '';
-    const valorTipo  = v('ed-valor-tipo') || 'VALOR_ABERTO';
-    const valorEstim = valorTipo !== 'VALOR_SIG' ? (v('ed-valor-estimado') || '') : '';
-    if (valorTipo !== 'VALOR_SIG' && !valorEstim) {
-      ocultarLoading();
-      if (btn) { btn.disabled = false; btn.textContent = labelOrig; }
-      alert('Informe o Valor Estimado ou selecione "Sigiloso".');
-      return;
-    }
+const julgamento = crit.CRITERIO_JULG || v('ed-julg-inline') || '';
+const valorTipo  = crit.DIVULG_VALOR  || v('ed-valor-tipo')  || 'VALOR_ABERTO';
+const valorEstim = valorTipo !== 'VALOR_SIG' ? (crit.VALOR_ESTIMADO || v('ed-valor-estimado') || '') : '';
+if (!julgamento) {
+  ocultarLoading();
+  if (btn) { btn.disabled = false; btn.textContent = labelOrig; }
+  alert('Selecione o Critério de Julgamento antes de gerar o Edital.');
+  return;
+}
+if (valorTipo !== 'VALOR_SIG' && !valorEstim) {
+  ocultarLoading();
+  if (btn) { btn.disabled = false; btn.textContent = labelOrig; }
+  alert('Informe o Valor Estimado ou selecione "Sigiloso".');
+  return;
+}
+// Salva no banco se veio inline (comprador preencheu sem ter feito o TR)
+const camposInline = {};
+if (!crit.CRITERIO_JULG && julgamento)  camposInline.CRITERIO_JULG = julgamento;
+if (!crit.DIVULG_VALOR  && valorTipo)   camposInline.DIVULG_VALOR  = valorTipo;
+if (!crit.VALOR_ESTIMADO && valorEstim) camposInline.VALOR_ESTIMADO = valorEstim;
+if (Object.keys(camposInline).length > 0) {
+  gasCall('salvarCriterioInline', { numProc: p.PROCESSO, campos: camposInline });
+}
     const res = await gasCall(isAquisicaoEd ? 'gerarEditalAquisicao' : 'gerarEdital', {
       numProc:      p.PROCESSO,
       PROCESSO:     p.PROCESSO,
+      julgamento:   julgamento,
       qtdItens:     divisao === 'ITEM_DIV'  ? v('ed-qtd-itens') : '',
       qtdGrupos:    divisao === 'ITEM_GRUP' ? v('ed-qtd-grup')  : '',
       textMarca:    v('ed-marca')      === 'MARCA'      ? v('ed-text-marca')  : '',
@@ -3705,23 +4336,8 @@ function _carregarPdfLib() {
       <div class="fro"><span class="fri">✓</span><div><div class="frl">Processo</div><div class="frv" id="ed-r-proc">—</div><div class="frs">← Tabela 1</div></div></div>
       <div class="fro"><span class="fri">✓</span><div><div class="frl">Objeto</div><div class="frv" id="ed-r-obj">—</div><div class="frs">← Tabela 1</div></div></div>
       <div id="ed-bloco-comp"></div>
-      <div class="fro"><span class="fri">✓</span><div><div class="frl">Critério de Julgamento</div><div class="frv" id="ed-r-julg">—</div><div class="frs">← TR Administrativo</div></div></div>
-      <div class="fe">
-        <label>Divulgação de Valores <span class="req">*</span></label>
-        <select id="ed-valor-tipo" onchange="
-          document.getElementById('fe-ed-valor-estimado').style.display =
-            this.value === 'VALOR_SIG' ? 'none' : '';
-        ">
-          <option value="VALOR_ABERTO">Tabela Aberta</option>
-          <option value="VALOR_ABERTO_DESC">Referência c/ Desconto</option>
-          <option value="VALOR_SIG">Sigiloso</option>
-        </select>
-      </div>
-      <div class="fe" id="fe-ed-valor-estimado">
-        <label>Valor Estimado <span class="req">*</span></label>
-        <input id="ed-valor-estimado" placeholder="Ex: R$ 120.000,00"/>
-      </div>
-
+      <div id="ed-bloco-julg"></div>
+<div id="ed-bloco-valor"></div>
       <div class="mfsec">Modo de Disputa e Participação</div>
       <div class="row2">
         <div class="fe">
@@ -4238,25 +4854,17 @@ function _carregarPdfLib() {
           </select>
         </div>
       </div>
-      <div class="row2">
-        <div class="fe">
-          <label>Garantia Contratual <span class="req">*</span></label>
-          <select id="cont-garantia">
-            <option value="SEM_GARANTIA">Não Exigida</option>
-            <option value="COM_GARANTIA">Exigida</option>
-          </select>
-        </div>
-        <div class="fe">
-          <label>Garantia complementar à legal <span class="req">*</span></label>
-          <select id="cont-tipo-garantia" onchange="
-            document.getElementById('fe-cont-prazo-garant').style.display =
-              this.value === 'EXIG_GAR_MIN' ? '' : 'none';
-          ">
-            <option value="EXIG_GAR_MIN">Garantia Mínima Exigida</option>
-            <option value="GAR_DECL_PROP">Garantia Declarada na Proposta</option>
-          </select>
-        </div>
-      </div>
+<div id="cont-bloco-garantia"></div>
+<div class="fe">
+  <label>Garantia complementar à legal <span class="req">*</span></label>
+  <select id="cont-tipo-garantia" onchange="
+    document.getElementById('fe-cont-prazo-garant').style.display =
+      this.value === 'EXIG_GAR_MIN' ? '' : 'none';
+  ">
+    <option value="EXIG_GAR_MIN">Garantia Mínima Exigida</option>
+    <option value="GAR_DECL_PROP">Garantia Declarada na Proposta</option>
+  </select>
+</div>
       <div class="fe" id="fe-cont-prazo-garant">
         <label>Prazo de Garantia Complementar à Legal</label>
         <input id="cont-prazo-garant" placeholder="Ex: 12 (doze) meses"/>
