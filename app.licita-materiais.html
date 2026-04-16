@@ -774,7 +774,20 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
       <div class="mproc" id="mpp-proc">—</div>
     </div>
     <div class="mbody" style="max-height:70vh;overflow-y:auto;">
- 
+ <!-- Loading overlay pesquisa -->
+      <div id="pp-loading" style="display:none;flex-direction:column;align-items:center;
+           justify-content:center;padding:48px 0;gap:16px;">
+        <div style="width:36px;height:36px;border:4px solid var(--border);
+             border-top-color:var(--red);border-radius:50%;
+             animation:pp-spin 0.8s linear infinite;"></div>
+        <div style="font-size:13px;font-weight:600;color:var(--gray4);">
+          🔍 Pesquisando no PNCP…
+        </div>
+        <div style="font-size:11px;color:var(--gray4);">Isso pode levar alguns segundos</div>
+      </div>
+      <style>
+        @keyframes pp-spin { to { transform: rotate(360deg); } }
+      </style>
       <!-- PASSO 1: Configuração dos itens -->
       <div id="pp-passo1">
         <div class="mfsec">Itens do processo</div>
@@ -804,9 +817,9 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
       <div class="mhint" id="pp-mhint">Busca em dadosabertos.compras.gov.br</div>
       <div class="macts">
         <button class="bcancelar" id="pp-btn-cancelar" onclick="fecharOv('ov-pp')">Cancelar</button>
-        <button class="bgerar"    id="pp-btn-acao"     onclick="previewPP()">🔍 Visualizar resultados</button>
-      </div>
-    </div>
+        <button class="bcancelar" id="pp-btn-salvar"   onclick="salvarRascunhoPP()"
+<button class="bcancelar" id="pp-btn-salvar"
+          style="display:none;">💾 Salvar rascunho</button>    </div>
   </div>
 </div>
  
@@ -1485,6 +1498,8 @@ function htmlFase2() {
   ${btn('📄','Gerar Informação Instaurar Sessão','Parecer PG + Despacho PG','doc','abrirModal142()')}
   ${btn('📄','Gerar Ato de Designação','Pregoeiro + Equipe de Apoio','doc','abrirModal144()')}
   ${btn('📄','Gerar Aviso de Abertura','Nº Pregão + Datas','doc','abrirModal148()')}
+  ${btn('🔍','Verificar Publicação DOE-SP','Abre busca com nº do pregão pronto para colar','util','abrirModalDOE()')}
+  ${btn('📋','Formulário de Impugnações / Esclarecimentos','Abre o formulário para os licitantes','util','abrirFormularioImpugnacoes()')}
   <div class="psec">E-mails e Despacho</div>
   ${btn('✉️','E-mail Gibbor — Folha de SP','Nº Pregão + Data de Publicação','email','abrirModal149()')}
   ${btn('✉️','E-mail de Abertura aos Interessados','supri.materiais@dga.unicamp.br','email','abrirModal1413()')}
@@ -1738,6 +1753,22 @@ async function criarProcessoEmAndamento() {
   }
 }
 // ══════════ ABRIR MODAIS ══════════
+function abrirModalDOE() {
+  const p = dg();
+  const numPregao = p.N_PREGAO || '';
+  document.getElementById('doe-num-pregao').textContent = numPregao;
+  navigator.clipboard.writeText(numPregao).catch(() => {});
+  abrirOv('ov-doe');
+}
+
+function confirmarAbrirDOE() {
+  window.open('https://www.doe.sp.gov.br/', '_blank');
+  fecharOv('ov-doe');
+}
+function abrirFormularioImpugnacoes() {
+  window.open('https://forms.gle/zhLK23sF4vFGyxQm8', '_blank');
+}
+
 function abrirModal142() {
   const p = dg();
   document.getElementById('m142-proc').textContent  = p.PROCESSO + ' · ' + p.INTERESSADO;
@@ -2090,12 +2121,352 @@ function abrirModal151() {
   abrirOv('ov-151');
 }
 
-function abrirPP() {
+async function abrirPP() {
   const p = dg();
   document.getElementById('mpp-proc').textContent = p.PROCESSO + ' · ' + p.INTERESSADO;
-  renderTabelaItens();
-  ['pp-item','pp-desc','pp-catmat','pp-cod'].forEach(id => { document.getElementById(id).value = ''; });
+  ppRascunho = {};
+
+  try {
+    const r = await gasCall('carregarRascunhoPP', { numProc: p.PROCESSO });
+    if (r.ok && r.rascunho.length > 0) {
+      r.rascunho.forEach(function(entry) {
+        ppRascunho[String(entry.item)] = entry;
+      });
+    }
+  } catch(e) {}
+['pp-item','pp-desc','pp-catmat','pp-cod'].forEach(id => { document.getElementById(id).value = ''; });
   abrirOv('ov-pp');
+  renderTabelaItensPP();
+}
+  function renderTabelaItensPP() {
+  const itens = procAtual.itens || [];
+  if (itens.length === 0) {
+    document.getElementById('mpp-itens').innerHTML = '<div style="color:var(--gray4);font-size:12px;padding:8px;">Nenhum item cadastrado.</div>';
+    return;
+  }
+
+  const concluidos = itens.filter(function(it) {
+    const r = ppRascunho[String(it.ITEM || '')];
+    return r && r.status === 'CONCLUIDO';
+  }).length;
+  const comRascunho = itens.filter(function(it) {
+    const r = ppRascunho[String(it.ITEM || '')];
+    return r && r.status === 'PENDENTE';
+  }).length;
+  const temSalvos = concluidos + comRascunho > 0;
+
+let html = `
+  <div style="display:flex;justify-content:space-between;align-items:center;
+       margin-bottom:10px;padding:10px 12px;background:#f5f5f5;border-radius:8px;">
+    <div style="font-size:12px;color:var(--gray4);">
+      ✅ <strong>${concluidos}</strong> concluído(s) &nbsp;·&nbsp;
+      📋 <strong>${comRascunho}</strong> rascunho(s) &nbsp;·&nbsp;
+      ⬜ <strong>${itens.length - concluidos - comRascunho}</strong> não iniciado(s)
+      &nbsp;de&nbsp; <strong>${itens.length}</strong> itens
+    </div>
+    <button id="btn-excluir-sel-pp" onclick="confirmarExcluirSelecionadosPP()"
+      style="display:none;background:#c62828;color:#fff;border:none;border-radius:5px;
+             padding:5px 12px;font-size:12px;cursor:pointer;">
+      🗑️ Excluir selecionados
+    </button>
+  </div>
+  <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <tr style="background:var(--gray1);">
+      <th style="padding:6px 8px;border-bottom:1px solid var(--border);width:30px;">
+        <input type="checkbox" id="chk-pp-all-excluir" onclick="toggleTodosExcluirPP(this)" title="Selecionar todos"/>
+      </th>
+      <th style="padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);">Item</th>
+      <th style="padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);">Descrição</th>
+      <th style="padding:6px 10px;text-align:left;border-bottom:1px solid var(--border);">CATMAT</th>
+      <th style="padding:6px 10px;text-align:center;border-bottom:1px solid var(--border);">Status</th>
+      <th style="padding:6px 10px;text-align:center;border-bottom:1px solid var(--border);">Ação</th>
+    </tr>`;
+
+  itens.forEach(function(it) {
+    const itemNum  = String(it.ITEM || '');
+    const rasc     = ppRascunho[itemNum];
+    const status   = rasc ? rasc.status       : '';
+    const dataRasc = rasc ? rasc.dataPesquisa : '';
+    const amostras = rasc && rasc.itensSelecionados ? rasc.itensSelecionados.length : 0;
+
+    const badge = status === 'CONCLUIDO'
+      ? `<span style="color:#2e7d32;font-weight:700;" title="Salvo em ${dataRasc}">✅ Concluído (${amostras})</span>`
+      : status === 'PENDENTE'
+      ? `<span style="color:#e65100;font-weight:700;" title="Salvo em ${dataRasc}">📋 Rascunho (${amostras})</span>`
+      : `<span style="color:var(--gray4);">⬜ Não iniciado</span>`;
+
+    const labelBtn = status ? '✏️ Editar' : '🔍 Pesquisar';
+
+    html += `<tr>
+      <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;">
+        <input type="checkbox" class="chk-item-pp-excluir" data-idx="${itens.indexOf(it)}" onchange="atualizarBtnExcluirPP()"/>
+      </td>
+      <td style="padding:6px 10px;border-bottom:1px solid var(--border);font-family:monospace;">${itemNum}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid var(--border);">${it.DESCRICAO||''}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid var(--border);font-family:monospace;">${it.CATMAT||''}</td>
+      <td style="padding:6px 10px;border-bottom:1px solid var(--border);text-align:center;">${badge}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;">
+        <button onclick="editarItemPP('${itemNum}')"
+          style="padding:5px 12px;background:var(--red);color:#fff;border:none;
+                 border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;">
+          ${labelBtn}
+        </button>
+      </td>
+    </tr>`;
+  });
+
+  html += '</table></div>';
+  document.getElementById('mpp-itens').innerHTML = html;
+
+  // Botão principal: gerar planilha só aparece quando há itens salvos
+const btnAcao = document.getElementById('pp-btn-acao');
+  if (btnAcao) {
+    if (temSalvos) {
+      btnAcao.textContent   = '📊 Gerar planilha';
+      btnAcao.onclick       = confirmarGerarPP;
+      btnAcao.style.display = '';
+    } else {
+      btnAcao.style.display = 'none';
+    }
+  }
+} // fecha renderTabelaItensPP
+
+function atualizarBtnExcluirPP() {
+  const algum = document.querySelectorAll('.chk-item-pp-excluir:checked').length > 0;
+  const btn   = document.getElementById('btn-excluir-sel-pp');
+  if (btn) btn.style.display = algum ? '' : 'none';
+}
+
+
+function toggleTodosExcluirPP(chkAll) {
+  document.querySelectorAll('.chk-item-pp-excluir').forEach(function(chk) {
+    chk.checked = chkAll.checked;
+  });
+  atualizarBtnExcluirPP();
+}
+
+function confirmarExcluirSelecionadosPP() {
+  const selecionados = [];
+  document.querySelectorAll('.chk-item-pp-excluir:checked').forEach(function(chk) {
+    selecionados.push(parseInt(chk.dataset.idx));
+  });
+  if (selecionados.length === 0) return;
+  if (!confirm('Excluir ' + selecionados.length + ' item(ns) selecionado(s)?')) return;
+
+  // Remove do maior índice para o menor para não deslocar
+  selecionados.sort(function(a, b) { return b - a; });
+  selecionados.forEach(function(idx) { procAtual.itens.splice(idx, 1); });
+
+  gasCall('salvarItens', { numProc: dg().PROCESSO, itens: procAtual.itens.map(mapItem) })
+    .then(function() { toast('🗑️', 'Itens excluídos!', selecionados.length + ' item(ns) removido(s).', true); })
+    .catch(function(e) { toast('⚠️', 'Excluído localmente', 'Erro ao sincronizar: ' + e.message, false); });
+
+  renderTabelaItensPP();
+}
+async function editarItemPP(itemNum) {
+  const procItem = (procAtual.itens || []).find(function(it) {
+    return String(it.ITEM || '') === String(itemNum);
+  });
+  if (!procItem) return;
+
+  document.getElementById('pp-loading').style.display = 'flex';
+  document.getElementById('pp-passo1').style.display  = 'none';
+
+  ppItensPreview   = [];
+  ppCotacoesManual = {};
+  ppSelecionados   = {};
+  ppPaginacao      = {};
+  ppItensMarcados  = [itemNum];
+
+  try {
+    await gasCall('salvarItens', { numProc: dg().PROCESSO, itens: procAtual.itens.map(mapItem) });
+
+    const rasc        = ppRascunho[String(itemNum)];
+    const temRascunho = rasc && (
+      (rasc.itensSelecionados && rasc.itensSelecionados.length > 0) ||
+      (rasc.selecionados      && rasc.selecionados.length      > 0)
+    );
+console.log('RASCUNHO:', JSON.stringify(rasc));
+    console.log('temRascunho:', temRascunho);
+    if (temRascunho) {
+      rasc.itensSelecionados.forEach(function(it) {
+        if (!it.linkPNCP && it.pncpId) it.linkPNCP = _parsearLinkPNCP(it.pncpId);
+        it.fromRascunho = true;
+        ppItensPreview.push(it);
+      });
+      const itemKey = String(itemNum) + '_' + String(rasc.catmat || '');
+      ppPaginacao[itemKey] = {
+        paginaAtual:    0,
+        totalPaginas:   1,
+        totalRegistros: rasc.itensSelecionados.length,
+        catmat:         rasc.catmat    || '',
+        itemNum:        String(itemNum),
+        descItem:       rasc.descricao || '',
+        modoRascunho:   true
+      };
+      if (rasc.cotacoesManuals && rasc.cotacoesManuals.length > 0) {
+        ppCotacoesManual[itemKey] = rasc.cotacoesManuals;
+      }
+      ppItensPreview.forEach(function(it, idx) {
+        const ik = (it.itemNum || '?') + '_' + String(it.catmat || '');
+        if (!ppSelecionados[ik]) ppSelecionados[ik] = new Set();
+        ppSelecionados[ik].add(idx);
+      });
+
+    } else {
+      const r = await gasCall('previewPesquisaPrecos', {
+        numProc:           dg().PROCESSO,
+        limite:            0,
+        itensSelecionados: [itemNum]
+      });
+
+      ppItensPreview = r.itens || [];
+      ppItensPreview.forEach(function(it) {
+        if (!it.linkPNCP && it.pncpId) it.linkPNCP = _parsearLinkPNCP(it.pncpId);
+      });
+      ppItensPreview.forEach(function(it, idx) {
+        const ik = (it.itemNum || '?') + '_' + String(it.catmat || '');
+        if (!ppSelecionados[ik]) ppSelecionados[ik] = new Set();
+        ppSelecionados[ik].add(idx);
+      });
+      (r.resumo || []).forEach(function(res) {
+        const itMatch = ppItensPreview.find(function(it) {
+          return String(it.catmat || '') === String(res.catmat || '');
+        });
+        const ik = (itMatch ? (itMatch.itemNum || '?') : '?') + '_' + String(res.catmat || '');
+        ppPaginacao[ik] = {
+          paginaAtual:    1,
+          totalPaginas:   res.totalPaginas   || 1,
+          totalRegistros: res.totalRegistros || res.total || 0,
+          catmat:         String(res.catmat  || ''),
+          itemNum:        itMatch ? (itMatch.itemNum || '') : '',
+          descItem:       itMatch ? (itMatch.descItem || '') : '',
+          modoRascunho:   false
+        };
+      });
+    }
+
+    if (ppItensPreview.length === 0) {
+      document.getElementById('pp-preview-aviso-zero').style.display = '';
+      document.getElementById('pp-curadoria-container').innerHTML    = '';
+    } else {
+      document.getElementById('pp-preview-aviso-zero').style.display = 'none';
+      _renderCuradoria();
+    }
+
+const elPasso2  = document.getElementById('pp-passo2');
+    const elSalvar  = document.getElementById('pp-btn-salvar');
+    const elAcao    = document.getElementById('pp-btn-acao');
+    const elHint    = document.getElementById('pp-mhint');
+    const elCancelar = document.getElementById('pp-btn-cancelar');
+
+    if (elPasso2)   elPasso2.style.display   = '';
+    if (elHint)     elHint.textContent        = `Item ${itemNum} · ${procItem.DESCRICAO || ''}`;
+
+    if (elAcao) {
+      elAcao.textContent   = '✅ Concluir item';
+      elAcao.style.display = '';
+      elAcao.disabled      = false;
+      elAcao.onclick       = function() { salvarItemAtual(itemNum, 'CONCLUIDO'); };
+    }
+    if (elSalvar) {
+      elSalvar.textContent   = '💾 Salvar rascunho';
+      elSalvar.style.display = '';
+      elSalvar.disabled      = false;
+      elSalvar.onclick       = function() { salvarItemAtual(itemNum, 'PENDENTE'); };
+    }
+    if (elCancelar) {
+      elCancelar.textContent = '← Voltar';
+      elCancelar.onclick     = voltarConfigPP;
+    }
+  } catch(e) {
+    toast('❌', 'Erro ao editar item', e.message, false);
+    document.getElementById('pp-passo1').style.display = '';
+  }
+
+  document.getElementById('pp-loading').style.display = 'none';
+}
+async function salvarItemAtual(itemNum, status) {
+  const btnAcao   = document.getElementById('pp-btn-acao');
+  const btnSalvar = document.getElementById('pp-btn-salvar');
+  if (btnAcao)   { btnAcao.disabled   = true; btnAcao.textContent   = '💾 Salvando…'; }
+  if (btnSalvar) { btnSalvar.disabled = true; }
+
+  try {
+    // Busca itemKey tanto por itemNum quanto pelo padrão itemNum_catmat
+    let itemKey = Object.keys(ppPaginacao).find(function(k) {
+      return ppPaginacao[k].itemNum === String(itemNum);
+    });
+
+    // Fallback: busca pelo prefixo do itemNum
+    if (!itemKey) {
+      itemKey = Object.keys(ppPaginacao).find(function(k) {
+        return k.startsWith(String(itemNum) + '_');
+      });
+    }
+
+    const pag = itemKey ? ppPaginacao[itemKey] : {};
+
+    // Log para diagnóstico
+    console.log('salvarItemAtual — itemKey:', itemKey, '| pag:', JSON.stringify(pag));
+    console.log('ppPaginacao keys:', Object.keys(ppPaginacao));
+    console.log('ppSelecionados keys:', Object.keys(ppSelecionados));
+
+    const selecionadosPncpIds = [];
+    const itensSelecionados   = [];
+    if (itemKey) {
+      ppItensPreview.forEach(function(it, idx) {
+        const k = (it.itemNum || '?') + '_' + String(it.catmat || '');
+        if (k === itemKey && ppSelecionados[itemKey] && ppSelecionados[itemKey].has(idx)) {
+          selecionadosPncpIds.push(it.pncpId);
+          itensSelecionados.push(it);
+        }
+      });
+    }
+
+    await gasCall('salvarRascunhoPP', {
+      numProc: dg().PROCESSO,
+      itens: [{
+        item:              String(itemNum),
+        descricao:         pag.descItem || '',
+        catmat:            pag.catmat   || '',
+        selecionados:      selecionadosPncpIds,
+        itensSelecionados: itensSelecionados,
+        cotacoesManuals:   ppCotacoesManual[itemKey] || [],
+        status:            status
+      }]
+    });
+
+    ppRascunho[String(itemNum)] = {
+      item:              String(itemNum),
+      descricao:         pag.descItem || '',
+      catmat:            pag.catmat   || '',
+      selecionados:      selecionadosPncpIds,
+      itensSelecionados: itensSelecionados,
+      cotacoesManuals:   ppCotacoesManual[itemKey] || [],
+      status:            status,
+      dataPesquisa:      new Date().toLocaleString('pt-BR')
+    };
+
+    toast('💾',
+      status === 'CONCLUIDO' ? '✅ Item concluído!' : '📋 Rascunho salvo!',
+      itensSelecionados.length + ' amostra(s) salva(s).',
+      true
+    );
+
+    voltarConfigPP();
+
+  } catch(e) {
+    toast('❌', 'Erro ao salvar item', e.message, false);
+    if (btnAcao)   { btnAcao.disabled   = false; btnAcao.textContent   = '✅ Concluir item'; }
+    if (btnSalvar) { btnSalvar.disabled = false; }
+  }
+}
+function toggleTodosPP(chkAll) {
+  document.querySelectorAll('.chk-pp-item').forEach(function(chk) {
+    chk.checked = chkAll.checked;
+  });
 }
 function abrirModalEdital() {
   const p = dg();
@@ -2249,9 +2620,8 @@ async function addItemPP() {
   }
   ocultarLoading();
   ['pp-item','pp-desc','pp-catmat','pp-cod'].forEach(id => { document.getElementById(id).value = ''; });
-  renderTabelaItens();
+renderTabelaItensPP();
 }
-
 function abrirHom() {
   const p = dg();
   document.getElementById('mhom-proc').textContent = p.PROCESSO + ' · ' + p.INTERESSADO;
@@ -2700,8 +3070,10 @@ async function gerar151() {
 let ppItensPreview   = [];   // resultados PNCP vindos do backend
 let ppCotacoesManual = {};   // { catmat: [ {fornecedor,cnpj,preco,unidade,observacao} ] }
 let ppSelecionados   = {};   // { catmat: Set de índices selecionados }
+let ppRascunho       = {};  // { itemNum: { selecionados, cotacoesManuals, status, dataPesquisa } }
+let ppItensMarcados  = [];  // itens marcados no passo 1 para pesquisar agora// ─── Extrai linkPNCP do pncpId caso venha vazio do backend ────
+let ppPaginacao      = {};  // { itemKey: { paginaAtual, totalPaginas, totalRegistros, catmat, itemNum, descItem } }
 
-// ─── Extrai linkPNCP do pncpId caso venha vazio do backend ────
 function _parsearLinkPNCP(pncpId) {
   if (!pncpId) return '';
   try {
@@ -2713,83 +3085,61 @@ function _parsearLinkPNCP(pncpId) {
  
 // ─── Passo 1→2: busca resultados e renderiza curadoria ────────
 async function previewPP() {
-  if (!procAtual.itens.length) { alert('Adicione pelo menos um item.'); return; }
-  const btn = document.getElementById('pp-btn-acao');
-  setLoading(btn, true, '⏳ Buscando…');
-  try {
-    await gasCall('salvarItens', { numProc: dg().PROCESSO, itens: procAtual.itens.map(mapItem) });
-    const r = await gasCall('previewPesquisaPrecos', { numProc: dg().PROCESSO, limite: 0 });
- 
-    ppItensPreview   = r.itens || [];
-    ppCotacoesManual = {};
-    ppSelecionados   = {};
- 
-    // Garante linkPNCP em todos os itens (segurança caso backend envie vazio)
-    ppItensPreview.forEach(function(it) {
-      if (!it.linkPNCP && it.pncpId) it.linkPNCP = _parsearLinkPNCP(it.pncpId);
-    });
- 
-    // Inicializa seleção: todos marcados por padrão
-    ppItensPreview.forEach(function(it, idx) {
-      const c = String(it.catmat || '');
-      if (!ppSelecionados[c]) ppSelecionados[c] = new Set();
-      ppSelecionados[c].add(idx);
-    });
- 
-    if (r.total === 0) {
-      document.getElementById('pp-preview-aviso-zero').style.display = '';
-      document.getElementById('pp-curadoria-container').innerHTML    = '';
-    } else {
-      document.getElementById('pp-preview-aviso-zero').style.display = 'none';
-      _renderCuradoria();
-    }
- 
-    document.getElementById('pp-passo1').style.display = 'none';
-    document.getElementById('pp-passo2').style.display = '';
-    document.getElementById('pp-mhint').textContent    = r.total + ' resultado(s) encontrado(s)';
- 
-    const btnAcao = document.getElementById('pp-btn-acao');
-    btnAcao.textContent = '📊 Gerar planilha';
-    btnAcao.onclick     = confirmarGerarPP;
-    document.getElementById('pp-btn-cancelar').textContent = '← Voltar';
-    document.getElementById('pp-btn-cancelar').onclick     = voltarConfigPP;
- 
-  } catch(e) {
-    toast('❌', 'Erro na visualização', e.message, false);
+  // Mantida por compatibilidade — o novo fluxo usa editarItemPP por item
+  // Pesquisa todos os itens não iniciados de uma vez (fallback)
+  const naoIniciados = (procAtual.itens || [])
+    .filter(function(it) { return !ppRascunho[String(it.ITEM || '')]; })
+    .map(function(it) { return String(it.ITEM || ''); });
+  if (naoIniciados.length > 0) {
+    await editarItemPP(naoIniciados[0]);
+  } else {
+    toast('ℹ️', 'Todos os itens já foram pesquisados', 'Use "Editar" para revisar cada item.', true);
   }
-  setLoading(btn, false, '🔍 Visualizar resultados');
-}
- 
+} 
 // ─── Renderiza curadoria completa ─────────────────────────────
 const PP_LIMITE_INICIAL = 10; // exibe 10 mais recentes por padrão
  
 function _renderCuradoria() {
-  const grupos = {};
-  const ordem  = [];
+  const grupos    = {};
+  const metaGrupo = {};
+  const ordem     = [];
   ppItensPreview.forEach(function(it, idx) {
-    const c = String(it.catmat || '');
-    if (!grupos[c]) { grupos[c] = []; ordem.push(c); }
-    grupos[c].push({ it, idx });
+    const itemKey = (it.itemNum || '?') + '_' + String(it.catmat || '');
+    if (!grupos[itemKey]) {
+      grupos[itemKey] = [];
+      ordem.push(itemKey);
+      metaGrupo[itemKey] = {
+        catmat:  String(it.catmat  || ''),
+        itemNum: it.itemNum  || '?',
+        descItem: it.descItem || ''
+      };
+    }
+    grupos[itemKey].push({ it, idx });
   });
- 
+
   let html = '';
-  ordem.forEach(function(catmat) {
-    const items = grupos[catmat];
-    if (!ppCotacoesManual[catmat]) ppCotacoesManual[catmat] = [];
+  ordem.forEach(function(itemKey) {
+    const items = grupos[itemKey];
+    const meta  = metaGrupo[itemKey];
+    if (!ppCotacoesManual[itemKey]) ppCotacoesManual[itemKey] = [];
     const total    = items.length;
     const exibindo = Math.min(total, PP_LIMITE_INICIAL);
     const temMais  = total > PP_LIMITE_INICIAL;
- 
+
     html += `
     <div style="margin-bottom:20px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">
- 
-      <!-- Cabeçalho CATMAT -->
+
+      <!-- Cabeçalho Item -->
       <div style="background:#2B2B2B;color:#fff;padding:10px 14px;font-weight:700;font-size:13px;
                   display:flex;justify-content:space-between;align-items:center;">
-        <span>CATMAT ${catmat}</span>
-        <span style="font-size:11px;font-weight:400;opacity:.7;">${total} contratação(ões) encontrada(s) no período</span>
+        <span>ITEM ${meta.itemNum} · CATMAT ${meta.catmat} · ${meta.descItem}</span>
+        <span style="font-size:11px;font-weight:400;opacity:.7;">
+          ${(ppPaginacao[itemKey] && ppPaginacao[itemKey].totalRegistros > total)
+            ? ppPaginacao[itemKey].totalRegistros + ' encontradas · exibindo ' + exibindo
+            : total + ' contratação(ões) encontrada(s)'}
+        </span>
       </div>
- 
+
       <!-- Tabela -->
       <div style="overflow-x:auto;">
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
@@ -2798,10 +3148,10 @@ function _renderCuradoria() {
               <th style="padding:7px 8px;border-bottom:1px solid var(--border);width:32px;">
                 <!-- Selecionar todas -->
                 <div style="display:flex;flex-direction:column;gap:3px;align-items:center;">
-                  <input type="checkbox" id="pp-chk-all-${catmat}"
-                    onchange="ppToggleTodos('${catmat}',this.checked)"
+                  <input type="checkbox" id="pp-chk-all-${itemKey}"
+                    onchange="ppToggleTodos('${itemKey}',this.checked)"
                     checked title="Selecionar todas"/>
-                  <button onclick="ppToggleTodos('${catmat}',false)"
+                  <button onclick="ppToggleTodos('${itemKey}',false)"
                     style="font-size:9px;background:none;border:none;cursor:pointer;
                            color:var(--red);padding:0;line-height:1;" title="Desmarcar todas">✕all</button>
                 </div>
@@ -2815,11 +3165,11 @@ function _renderCuradoria() {
               <th style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--border);">Links</th>
             </tr>
           </thead>
-          <tbody id="pp-tbody-${catmat}">`;
+          <tbody id="pp-tbody-${itemKey}">`;
  
     // Exibe as 10 primeiras
     items.slice(0, exibindo).forEach(function(entry) {
-      html += _renderLinhaItem(entry, catmat);
+      html += _renderLinhaItem(entry, itemKey);
     });
  
     html += `
@@ -2828,21 +3178,40 @@ function _renderCuradoria() {
       </div>`;
  
     // Botão "Ver mais" se houver mais de 10
-    if (temMais) {
+const pag      = ppPaginacao[itemKey];
+    const temMaisBackend = pag && pag.totalPaginas > 1;
+    const temMaisLocal   = total > exibindo;
+
+if (temMaisLocal || temMaisBackend) {
+      const totalRestante = pag
+        ? (pag.totalRegistros - exibindo)
+        : (total - exibindo);
       html += `
-      <div id="pp-vermais-${catmat}" style="text-align:center;padding:8px;">
-        <button onclick="ppVerMais('${catmat}')"
+      <div id="pp-vermais-${itemKey}" style="text-align:center;padding:8px;">
+        <button onclick="ppVerMais('${itemKey}')"
           style="background:none;border:1px solid var(--blue);border-radius:6px;
                  color:var(--blue);font-size:12px;font-weight:600;padding:6px 18px;
                  cursor:pointer;font-family:inherit;">
-          ▼ Ver mais ${total - exibindo} contratação(ões)
+          ▼ Ver mais ${totalRestante} contratação(ões)
         </button>
       </div>`;
     }
- 
-    // Estatísticas ao vivo
+
+    // Botão buscar mais da API (só aparece no modo rascunho)
+    if (pag && pag.modoRascunho) {
+      html += `
+      <div id="pp-buscarapi-${itemKey}" style="text-align:center;padding:8px;border-top:1px solid var(--border);">
+        <button onclick="ppBuscarMaisAPI('${itemKey}')"
+          style="background:none;border:1px solid var(--gray4);border-radius:6px;
+                 color:var(--gray4);font-size:12px;font-weight:600;padding:6px 18px;
+                 cursor:pointer;font-family:inherit;">
+          🔍 Buscar mais contratações na API
+        </button>
+      </div>`;
+    }
+      // Estatísticas ao vivo
     html += `
-      <div id="pp-stats-${catmat}" style="display:flex;gap:16px;padding:10px 14px;
+      <div id="pp-stats-${itemKey}" style="display:flex;gap:16px;padding:10px 14px;
            background:#f9f9f9;border-top:1px solid var(--border);flex-wrap:wrap;align-items:center;"></div>
  
       <!-- Cotações manuais -->
@@ -2853,38 +3222,111 @@ function _renderCuradoria() {
         </div>
         <div style="display:grid;grid-template-columns:1fr 140px 110px 80px 1fr 32px;gap:6px;align-items:end;">
           <div><label style="font-size:10px;color:var(--gray4);">Fornecedor</label>
-               <input id="pp-man-forn-${catmat}" placeholder="Nome do fornecedor"
+               <input id="pp-man-forn-${itemKey}" placeholder="Nome do fornecedor"
                  style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;"/></div>
           <div><label style="font-size:10px;color:var(--gray4);">CNPJ</label>
-               <input id="pp-man-cnpj-${catmat}" placeholder="00.000.000/0001-00"
+               <input id="pp-man-cnpj-${itemKey}" placeholder="00.000.000/0001-00"
                  style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;"/></div>
           <div><label style="font-size:10px;color:var(--gray4);">Preço Unit.</label>
-               <input id="pp-man-preco-${catmat}" type="number" step="0.01" placeholder="0,00"
-                 oninput="ppAtualizarEstatisticas('${catmat}')"
+               <input id="pp-man-preco-${itemKey}" type="number" step="0.01" placeholder="0,00"
+                 oninput="ppAtualizarEstatisticas('${itemKey}')"
                  style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;"/></div>
           <div><label style="font-size:10px;color:var(--gray4);">Un.</label>
-               <input id="pp-man-un-${catmat}" placeholder="PAR"
+               <input id="pp-man-un-${itemKey}" placeholder="PAR"
                  style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;"/></div>
           <div><label style="font-size:10px;color:var(--gray4);">Observação</label>
-               <input id="pp-man-obs-${catmat}" placeholder="Ex: Proposta via e-mail"
+               <input id="pp-man-obs-${itemKey}" placeholder="Ex: Proposta via e-mail"
                  style="width:100%;padding:6px 8px;border:1px solid var(--border);border-radius:5px;font-size:12px;font-family:inherit;"/></div>
-          <div><button onclick="ppAdicionarManual('${catmat}')"
+          <div><button onclick="ppAdicionarManual('${itemKey}')"
                style="width:32px;height:32px;background:var(--red);color:#fff;border:none;
                       border-radius:5px;font-size:16px;cursor:pointer;display:flex;align-items:center;
                       justify-content:center;" title="Adicionar">+</button></div>
         </div>
-        <div id="pp-man-lista-${catmat}" style="margin-top:8px;display:flex;flex-direction:column;gap:4px;"></div>
+        <div id="pp-man-lista-${itemKey}" style="margin-top:8px;display:flex;flex-direction:column;gap:4px;"></div>
       </div>
  
     </div>`;
   });
  
   document.getElementById('pp-curadoria-container').innerHTML = html;
-  ordem.forEach(function(c) { ppAtualizarEstatisticas(c); });
+  ordem.forEach(function(ik) { ppAtualizarEstatisticas(ik); });
 }
- 
+async function ppBuscarMaisAPI(itemKey) {
+  const pag = ppPaginacao[itemKey];
+  if (!pag) return;
+
+  const btnDiv = document.getElementById('pp-buscarapi-' + itemKey);
+  const btn    = btnDiv ? btnDiv.querySelector('button') : null;
+  if (btn) btn.textContent = '⏳ Buscando…';
+
+  try {
+    const r = await gasCall('buscarMaisItensPNCP', {
+      catmat:   pag.catmat,
+      pagina:   1,
+      itemNum:  pag.itemNum,
+      descItem: pag.descItem
+    });
+
+    if (r.ok && r.itens.length > 0) {
+      r.itens.forEach(function(it) {
+        if (!it.linkPNCP && it.pncpId) it.linkPNCP = _parsearLinkPNCP(it.pncpId);
+        it.fromRascunho = false;
+      });
+
+      // Filtra para não duplicar os que já estão em tela (do rascunho)
+      const pncpIdsExistentes = new Set(ppItensPreview.map(function(it) {
+        return (it.itemNum || '?') + '_' + String(it.catmat || '') === itemKey ? it.pncpId : null;
+      }));
+
+      const novos = r.itens.filter(function(it) { return !pncpIdsExistentes.has(it.pncpId); });
+      const idxInicio = ppItensPreview.length;
+      novos.forEach(function(it) { ppItensPreview.push(it); });
+
+      const tbody = document.getElementById('pp-tbody-' + itemKey);
+      if (tbody) {
+        let htmlExtra = '';
+        novos.forEach(function(it, i) {
+          htmlExtra += _renderLinhaItem({ it, idx: idxInicio + i }, itemKey);
+        });
+        tbody.insertAdjacentHTML('beforeend', htmlExtra);
+      }
+
+      // Atualiza paginação para modo API
+      ppPaginacao[itemKey].modoRascunho   = false;
+      ppPaginacao[itemKey].paginaAtual    = 1;
+      ppPaginacao[itemKey].totalPaginas   = r.totalPaginas   || 1;
+      ppPaginacao[itemKey].totalRegistros = r.totalRegistros || novos.length;
+
+      // Novos itens desmarcados por padrão
+      // (não adicionamos ao ppSelecionados — ficam desmarcados)
+
+      ppAtualizarSelecao(itemKey);
+
+      // Atualiza botão Ver mais se houver mais páginas
+      const temMais = r.totalPaginas > 1;
+      const vermaisDiv = document.getElementById('pp-vermais-' + itemKey);
+      if (temMais && !vermaisDiv) {
+        if (btnDiv) btnDiv.insertAdjacentHTML('beforebegin', `
+          <div id="pp-vermais-${itemKey}" style="text-align:center;padding:8px;">
+            <button onclick="ppVerMais('${itemKey}')"
+              style="background:none;border:1px solid var(--blue);border-radius:6px;
+                     color:var(--blue);font-size:12px;font-weight:600;padding:6px 18px;
+                     cursor:pointer;font-family:inherit;">
+              ▼ Ver mais ${r.totalRegistros - r.itens.length} contratação(ões)
+            </button>
+          </div>`);
+      }
+    }
+
+    if (btnDiv) btnDiv.remove();
+
+  } catch(e) {
+    if (btn) btn.textContent = '🔍 Buscar mais contratações na API (erro — tente novamente)';
+    toast('❌', 'Erro ao buscar da API', e.message, false);
+  }
+} 
 // ─── Renderiza uma linha da tabela de itens ────────────────────
-function _renderLinhaItem(entry, catmat) {
+function _renderLinhaItem(entry, itemKey) {
   const it  = entry.it;
   const idx = entry.idx;
   const preco = parseFloat(it.preco || 0).toLocaleString('pt-BR',{minimumFractionDigits:4,maximumFractionDigits:4});
@@ -2893,12 +3335,10 @@ function _renderLinhaItem(entry, catmat) {
   const linkPncp = it.linkPNCP || _parsearLinkPNCP(it.pncpId);
   const linkCnet = it.linkComprasNet || '';
  
-  const btnPNCP = linkPncp
-    ? `<a href="${linkPncp}" target="_blank" style="color:var(--blue);text-decoration:none;font-weight:600;" title="Abrir no PNCP">🏛</a>`
-    : '';
-  const btnCnet = linkCnet
-    ? `<a href="${linkCnet}" target="_blank" style="color:var(--blue);text-decoration:none;font-weight:600;margin-left:6px;" title="Abrir no Compras.gov">🛒</a>`
-    : '';
+const btnPNCP = '';  // removido do preview
+const btnCnet = linkCnet
+  ? `<a href="${linkCnet}" target="_blank" style="color:var(--blue);text-decoration:none;font-weight:600;" title="Abrir no Compras.gov">🛒 Compras.gov</a>`
+  : (linkPncp ? `<a href="${linkPncp}" target="_blank" style="color:var(--blue);text-decoration:none;font-weight:600;" title="Abrir no PNCP">🏛 PNCP</a>` : '');
  
   const orgao = (it.orgao || it.fornecedor || '');
   const desc  = (it.descricao || '');
@@ -2906,9 +3346,8 @@ function _renderLinhaItem(entry, catmat) {
   return `
     <tr id="pp-row-${idx}">
       <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;">
-        <input type="checkbox" class="pp-chk-item" data-catmat="${catmat}" data-idx="${idx}"
-          onchange="ppAtualizarSelecao('${catmat}')" checked/>
-      </td>
+<input type="checkbox" class="pp-chk-item" data-itemkey="${itemKey}" data-idx="${idx}"
+        onchange="ppAtualizarSelecao('${itemKey}')" checked/>      </td>
       <td style="padding:6px 10px;border-bottom:1px solid var(--border);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${orgao}">${orgao.substring(0,35)}${orgao.length>35?'…':''}</td>
       <td style="padding:6px 10px;border-bottom:1px solid var(--border);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${desc}">${desc.substring(0,40)}${desc.length>40?'…':''}</td>
       <td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;font-family:monospace;">${it.qtd||'—'}</td>
@@ -2920,81 +3359,155 @@ function _renderLinhaItem(entry, catmat) {
 }
  
 // ─── Expande para mostrar todas as contratações do CATMAT ──────
-function ppVerMais(catmat) {
-  // Encontra os itens não exibidos ainda
-  const tbody = document.getElementById('pp-tbody-' + catmat);
+async function ppVerMais(itemKey) {
+  const tbody = document.getElementById('pp-tbody-' + itemKey);
   if (!tbody) return;
+
   const jaExibidos = tbody.querySelectorAll('tr').length;
- 
-  let htmlExtra = '';
-  let count = 0;
+
+  // Conta quantos itens locais ainda não foram exibidos
+  let htmlLocal  = '';
+  let countLocal = 0;
+  let totalLocal = 0;
   ppItensPreview.forEach(function(it, idx) {
-    if (String(it.catmat||'') !== catmat) return;
-    count++;
-    if (count <= jaExibidos) return; // pula os já exibidos
-    htmlExtra += _renderLinhaItem({ it, idx }, catmat);
+    const key = (it.itemNum || '?') + '_' + String(it.catmat || '');
+    if (key !== itemKey) return;
+    totalLocal++;
+    if (totalLocal <= jaExibidos) return;
+    htmlLocal += _renderLinhaItem({ it, idx }, itemKey);
+    countLocal++;
   });
- 
-  tbody.insertAdjacentHTML('beforeend', htmlExtra);
- 
-  // Remove o botão "Ver mais"
-  const btnVer = document.getElementById('pp-vermais-' + catmat);
-  if (btnVer) btnVer.remove();
- 
-  // Recalcula seleção e estatísticas
-  ppAtualizarSelecao(catmat);
+
+  // Se ainda tem itens locais, exibe e para por aqui
+  if (htmlLocal) {
+    tbody.insertAdjacentHTML('beforeend', htmlLocal);
+    ppAtualizarSelecao(itemKey);
+
+    // Atualiza botão
+    const pag = ppPaginacao[itemKey];
+    const totalExibidos = tbody.querySelectorAll('tr').length;
+    const totalGlobal   = pag ? pag.totalRegistros : totalLocal;
+    const totalRestante = totalGlobal - totalExibidos;
+    const temMaisBackend = pag && pag.paginaAtual < pag.totalPaginas;
+    const btnVer = document.getElementById('pp-vermais-' + itemKey);
+
+    if ((temMaisBackend || totalRestante > 0) && btnVer) {
+      const btn = btnVer.querySelector('button');
+      if (btn) btn.textContent = `▼ Ver mais ${totalRestante > 0 ? totalRestante : ''} contratação(ões)`;
+    } else if (btnVer) {
+      btnVer.remove();
+    }
+    return;
+  }
+
+  // Sem itens locais — busca próxima página no backend
+  const pag = ppPaginacao[itemKey];
+  if (!pag || pag.paginaAtual >= pag.totalPaginas) {
+    const btnVer = document.getElementById('pp-vermais-' + itemKey);
+    if (btnVer) btnVer.remove();
+    return;
+  }
+
+  const btnVer = document.getElementById('pp-vermais-' + itemKey);
+  if (btnVer) {
+    const btn = btnVer.querySelector('button');
+    if (btn) btn.textContent = '⏳ Buscando mais…';
+  }
+
+  try {
+    const proximaPag = pag.paginaAtual + 1;
+    const r = await gasCall('buscarMaisItensPNCP', {
+      catmat:   pag.catmat,
+      pagina:   proximaPag,
+      itemNum:  pag.itemNum,
+      descItem: pag.descItem
+    });
+
+    if (r.ok && r.itens.length > 0) {
+      r.itens.forEach(function(it) {
+        if (!it.linkPNCP && it.pncpId) it.linkPNCP = _parsearLinkPNCP(it.pncpId);
+      });
+
+      const idxInicio = ppItensPreview.length;
+      r.itens.forEach(function(it, i) {
+        ppItensPreview.push(it);
+        const idx = idxInicio + i;
+        if (!ppSelecionados[itemKey]) ppSelecionados[itemKey] = new Set();
+        ppSelecionados[itemKey].add(idx);
+      });
+
+      let htmlExtra = '';
+      r.itens.forEach(function(it, i) {
+        htmlExtra += _renderLinhaItem({ it, idx: idxInicio + i }, itemKey);
+      });
+      tbody.insertAdjacentHTML('beforeend', htmlExtra);
+      ppPaginacao[itemKey].paginaAtual = proximaPag;
+      ppAtualizarSelecao(itemKey);
+    }
+
+    const totalExibidos = tbody.querySelectorAll('tr').length;
+    const totalRestante = (r.totalRegistros || pag.totalRegistros) - totalExibidos;
+    const temMais = proximaPag < (r.totalPaginas || pag.totalPaginas) && totalRestante > 0;
+
+    if (temMais) {
+      if (btnVer) {
+        const btn = btnVer.querySelector('button');
+        if (btn) btn.textContent = `▼ Ver mais ${totalRestante} contratação(ões)`;
+      }
+    } else {
+      if (btnVer) btnVer.remove();
+    }
+
+  } catch(e) {
+    if (btnVer) btnVer.innerHTML = '▼ Ver mais (erro — tente novamente)';
+    toast('❌', 'Erro ao buscar mais', e.message, false);
+  }
 }
- 
 // ─── Toggle selecionar/desmarcar todas ────────────────────────
-function ppToggleTodos(catmat, marcado) {
-  document.querySelectorAll(`.pp-chk-item[data-catmat="${catmat}"]`).forEach(function(chk) {
+function ppToggleTodos(itemKey, marcado) {
+  document.querySelectorAll(`.pp-chk-item[data-itemkey="${itemKey}"]`).forEach(function(chk) {
     chk.checked = marcado;
   });
-  // Atualiza o checkbox "selecionar todas"
-  const chkAll = document.getElementById('pp-chk-all-' + catmat);
+  const chkAll = document.getElementById('pp-chk-all-' + itemKey);
   if (chkAll) chkAll.checked = marcado;
-  ppAtualizarSelecao(catmat);
+  ppAtualizarSelecao(itemKey);
 }
- 
+
 // ─── Atualiza seleção e recalcula estatísticas ─────────────────
-function ppAtualizarSelecao(catmat) {
-  if (!ppSelecionados[catmat]) ppSelecionados[catmat] = new Set();
-  ppSelecionados[catmat].clear();
-  document.querySelectorAll(`.pp-chk-item[data-catmat="${catmat}"]`).forEach(function(chk) {
-    if (chk.checked) ppSelecionados[catmat].add(parseInt(chk.dataset.idx));
+function ppAtualizarSelecao(itemKey) {
+  if (!ppSelecionados[itemKey]) ppSelecionados[itemKey] = new Set();
+  ppSelecionados[itemKey].clear();
+  document.querySelectorAll(`.pp-chk-item[data-itemkey="${itemKey}"]`).forEach(function(chk) {
+    if (chk.checked) ppSelecionados[itemKey].add(parseInt(chk.dataset.idx));
   });
+  const total = document.querySelectorAll(`.pp-chk-item[data-itemkey="${itemKey}"]`).length;
+  const sel   = ppSelecionados[itemKey].size;
+  const chkAll = document.getElementById('pp-chk-all-' + itemKey);  if (chkAll) chkAll.checked = (sel === total && total > 0);
  
-  const total = document.querySelectorAll(`.pp-chk-item[data-catmat="${catmat}"]`).length;
-  const sel   = ppSelecionados[catmat].size;
-  const chkAll = document.getElementById('pp-chk-all-' + catmat);
-  if (chkAll) chkAll.checked = (sel === total && total > 0);
- 
-  ppAtualizarEstatisticas(catmat);
+ppAtualizarEstatisticas(itemKey);
 }
  
 // ─── Calcula média, mediana e CV ao vivo ──────────────────────
-function ppAtualizarEstatisticas(catmat) {
-  const precos = [];
+function ppAtualizarEstatisticas(itemKey) {
+    const precos = [];
  
   ppItensPreview.forEach(function(it, idx) {
-    if (String(it.catmat||'') !== catmat) return;
-    if (ppSelecionados[catmat] && ppSelecionados[catmat].has(idx)) {
+    const key = (it.itemNum || '?') + '_' + String(it.catmat || '');
+    if (key !== itemKey) return;
+    if (ppSelecionados[itemKey] && ppSelecionados[itemKey].has(idx)) {
       const v = parseFloat(it.preco||0);
       if (v > 0) precos.push(v);
     }
   });
- 
-  const precoManInput = document.getElementById('pp-man-preco-' + catmat);
+  const precoManInput = document.getElementById('pp-man-preco-' + itemKey);
   if (precoManInput && parseFloat(precoManInput.value||0) > 0)
     precos.push(parseFloat(precoManInput.value));
  
-  (ppCotacoesManual[catmat]||[]).forEach(function(ct) {
+  (ppCotacoesManual[itemKey]||[]).forEach(function(ct) {
     const v = parseFloat(ct.preco||0);
     if (v > 0) precos.push(v);
   });
- 
-  const el = document.getElementById('pp-stats-' + catmat);
-  if (!el) return;
+  const el = document.getElementById('pp-stats-' + itemKey);  if (!el) return;
  
   if (precos.length === 0) {
     el.innerHTML = '<span style="font-size:12px;color:var(--gray4);">Nenhum item selecionado.</span>';
@@ -3080,18 +3593,21 @@ function ppRemoverManual(catmat, idx, elDiv) {
  
 // ─── Volta ao passo 1 ─────────────────────────────────────────
 function voltarConfigPP() {
-  document.getElementById('pp-passo1').style.display = '';
-  document.getElementById('pp-passo2').style.display = 'none';
-  document.getElementById('pp-mhint').textContent    = 'Busca em dadosabertos.compras.gov.br';
-  const btnAcao = document.getElementById('pp-btn-acao');
-  btnAcao.textContent = '🔍 Visualizar resultados';
-  btnAcao.onclick     = previewPP;
+  document.getElementById('pp-passo1').style.display  = '';
+  document.getElementById('pp-passo2').style.display  = 'none';
+  document.getElementById('pp-btn-salvar').style.display = 'none';
+  document.getElementById('pp-mhint').textContent     = 'Busca em dadosabertos.compras.gov.br';
+
   const btnCancelar = document.getElementById('pp-btn-cancelar');
   btnCancelar.textContent = 'Cancelar';
   btnCancelar.onclick     = () => fecharOv('ov-pp');
+
   ppItensPreview   = [];
   ppCotacoesManual = {};
   ppSelecionados   = {};
+  ppItensMarcados  = [];
+
+  renderTabelaItensPP(); // já atualiza o pp-btn-acao internamente
 }
  
 // ─── Confirma e gera planilha ─────────────────────────────────
@@ -3099,17 +3615,15 @@ async function confirmarGerarPP() {
   fecharOv('ov-pp');
   mostrarLoading('Gerando planilha de pesquisa de preços…');
   try {
-    const itensSelecionados = ppItensPreview.filter(function(it, idx) {
-      const c = String(it.catmat||'');
-      return ppSelecionados[c] && ppSelecionados[c].has(idx);
+// Consolida todos os rascunhos salvos
+    const itensSelecionados = [];
+    const todasManuals      = [];
+    Object.keys(ppRascunho).forEach(function(itemNum) {
+      const rasc = ppRascunho[itemNum];
+      (rasc.itensSelecionados || []).forEach(function(it) { itensSelecionados.push(it); });
+      (rasc.cotacoesManuals   || []).forEach(function(ct) { todasManuals.push(ct); });
     });
- 
-    const todasManuals = [];
-    Object.keys(ppCotacoesManual).forEach(function(catmat) {
-      (ppCotacoesManual[catmat]||[]).forEach(function(ct) { todasManuals.push(ct); });
-    });
- 
-    const todosPrecos = itensSelecionados.map(function(it){ return parseFloat(it.preco||0); })
+        const todosPrecos = itensSelecionados.map(function(it){ return parseFloat(it.preco||0); })
       .concat(todasManuals.map(function(ct){ return parseFloat(ct.preco||0); }))
       .filter(function(v){ return v > 0; });
  
@@ -3150,7 +3664,59 @@ async function confirmarGerarPP() {
   }
   ocultarLoading();
 }
+async function salvarRascunhoPP() {
+  const btnSalvar = document.getElementById('pp-btn-salvar');
+  if (btnSalvar) { btnSalvar.disabled = true; btnSalvar.textContent = '💾 Salvando…'; }
 
+  try {
+    const itens = [];
+    const itemKeysVistos = new Set();
+
+    ppItensPreview.forEach(function(it) {
+      const itemKey = (it.itemNum || '?') + '_' + String(it.catmat || '');
+      if (itemKeysVistos.has(itemKey)) return;
+      itemKeysVistos.add(itemKey);
+
+      const selecionadosPncpIds = [];
+      ppItensPreview.forEach(function(it2, idx2) {
+        const k2 = (it2.itemNum || '?') + '_' + String(it2.catmat || '');
+        if (k2 === itemKey && ppSelecionados[itemKey] && ppSelecionados[itemKey].has(idx2)) {
+          selecionadosPncpIds.push(it2.pncpId);
+        }
+      });
+
+      // Coleta os itens completos selecionados
+      const itensSelecionados = [];
+      ppItensPreview.forEach(function(it2, idx2) {
+        const k2 = (it2.itemNum || '?') + '_' + String(it2.catmat || '');
+        if (k2 === itemKey && ppSelecionados[itemKey] && ppSelecionados[itemKey].has(idx2)) {
+          itensSelecionados.push(it2);
+        }
+      });
+
+      itens.push({
+        item:              it.itemNum   || '',
+        descricao:         it.descItem  || '',
+        catmat:            it.catmat    || '',
+        selecionados:      selecionadosPncpIds,
+        itensSelecionados: itensSelecionados,
+        cotacoesManuals:   ppCotacoesManual[itemKey] || [],
+        status:            'PENDENTE'
+      });
+    });
+
+    await gasCall('salvarRascunhoPP', { numProc: dg().PROCESSO, itens });
+    toast('💾', 'Rascunho salvo!', itens.length + ' item(ns) salvos.', true);
+
+    // Atualiza ppRascunho em memória
+    itens.forEach(function(it) { ppRascunho[String(it.item)] = it; });
+
+  } catch(e) {
+    toast('❌', 'Erro ao salvar rascunho', e.message, false);
+  }
+
+  if (btnSalvar) { btnSalvar.disabled = false; btnSalvar.textContent = '💾 Salvar rascunho'; }
+}
  
 async function gerarPP() {
   // mantida por compatibilidade — redireciona para o novo fluxo
@@ -4078,7 +4644,25 @@ function _carregarPdfLib() {
   });
 }
 </script>
-
+<div id="ov-doe" class="ov" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <span>🔍 Verificar Publicação — DOE-SP</span>
+      <button onclick="fecharOv('ov-doe')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0 0 12px;font-size:13px;color:#555;">
+        O número do pregão abaixo foi copiado automaticamente para o clipboard.
+        Abra o DOE-SP, clique em <strong>AVANÇADA</strong>, cole no campo de busca e clique em <strong>PESQUISAR</strong>.
+      </p>
+      <div style="background:#f5f5f5;border:1px solid #ddd;border-radius:8px;padding:14px;text-align:center;margin-bottom:16px;">
+        <div style="font-size:11px;color:#888;margin-bottom:4px;">Nº DO PREGÃO (já copiado)</div>
+        <div id="doe-num-pregao" style="font-size:20px;font-weight:700;color:#2B2B2B;letter-spacing:1px;"></div>
+      </div>
+      <button class="btn-primary" onclick="confirmarAbrirDOE()">Abrir DOE-SP →</button>
+    </div>
+  </div>
+</div>
 <!-- Loading overlay (item 2) -->
 <div class="overlay" id="ov-loading" style="z-index:999;">
   <div class="modal" style="max-width:340px;text-align:center;padding:36px 28px;">
