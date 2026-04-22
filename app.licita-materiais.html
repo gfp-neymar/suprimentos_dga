@@ -880,13 +880,16 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
       </div>
  
     </div>
-    <div class="mftr">
+<div class="mftr">
       <div class="mhint" id="pp-mhint">Busca em dadosabertos.compras.gov.br</div>
       <div class="macts">
-      <button class="bcancelar" id="pp-btn-salvar" onclick="salvarRascunhoPP()" style="display: none;">💾 Salvar rascunho</button>  </div>
+        <button class="bcancelar" id="pp-btn-cancelar" onclick="fecharOv('ov-pp')">Cancelar</button>
+        <button class="bcancelar" id="pp-btn-salvar" onclick="salvarRascunhoPP()" style="display:none;">💾 Salvar rascunho</button>
+        <button class="bgerar"   id="pp-btn-acao"   onclick="confirmarGerarPP()"  style="display:none;">📊 Gerar planilha</button>
       </div>
-    </div>      
-  </div>       
+    </div>
+  </div>
+</div>
 
 <!-- Modal Homologação -->
 <div class="overlay" id="ov-hom" onclick="fecharOv('ov-hom',event)">
