@@ -14,7 +14,14 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif;min-height:100vh;}
-
+#ov-renovar-ata {
+  display: none !important;
+}
+#ov-renovar-ata.v {
+  display: flex !important;
+  animation: none;
+  opacity: 1;
+}
 /* HEADER */
 .header{background:var(--white);border-bottom:3px solid var(--red);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.08);}
 .hlogo{display:flex;align-items:center;gap:14px;}
@@ -289,6 +296,7 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
   </div>
   <div class="hright">
     <button class="btn-em-andamento" onclick="abrirModalEmAndamento()" style="margin-right:8px;">📋 Em Andamento</button>
+    <button class="btn-em-andamento" onclick="abrirModalRenovarAta()" style="margin-right:8px;">🔄 Renovar ATA</button>
     <button class="btn-novo-proc" onclick="abrirModalNovoProcesso()">＋ Novo Processo</button>
 <div style="position:relative;">
       <div class="avatar" id="avatar-btn" onclick="toggleAvatarMenu()">G</div>
@@ -395,6 +403,65 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
 </div>
 
 <!-- ══════════ MODAIS ══════════ -->
+ <!-- Modal Renovar ATA -->
+<div class="overlay" id="ov-renovar-ata" onclick="fecharOv('ov-renovar-ata',event)">
+  <div class="modal" onclick="event.stopPropagation()" style="max-width:580px;width:96vw;">
+    <div class="mhdr">
+      <div class="mdocl">🔄 Renovação</div>
+      <div class="mtitle">Renovar Ata de Registro de Preços</div>
+      <div class="mproc" id="mrata-sub">Preencha os dados abaixo</div>
+    </div>
+    <div class="mbody" style="max-height:70vh;overflow-y:auto;">
+
+      <div class="mfsec">Leitura automática da ATA (opcional)</div>
+      <div style="border:2px dashed var(--border);border-radius:8px;padding:16px;text-align:center;background:#fafafa;margin-bottom:16px;">
+        <div style="font-size:12px;color:var(--gray4);margin-bottom:8px;">
+          Faça upload do PDF da ATA para preencher automaticamente o Objeto e os Itens (CATMAT)
+        </div>
+        <input type="file" id="rata-pdf-input" accept="application/pdf" style="display:none" onchange="processarPdfAta(this)"/>
+        <button class="bgerar" onclick="document.getElementById('rata-pdf-input').click()" style="width:auto;padding:8px 20px;">
+          📎 Selecionar PDF da ATA
+        </button>
+        <div id="rata-pdf-status" style="font-size:11px;color:var(--gray4);margin-top:6px;"></div>
+      </div>
+
+      <div class="mfsec">Dados do processo</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div class="fe"><label>Nº Processo (Dossiê)*</label>
+          <input id="rata-proc" placeholder="Ex: 01-P-12345/2026"/></div>
+        <div class="fe"><label>Interessado*</label>
+          <input id="rata-int" placeholder="Ex: HC-Unicamp"/></div>
+      </div>
+      <div class="fe" style="margin-bottom:8px;"><label>Objeto / Assunto*</label>
+        <input id="rata-obj" placeholder="Ex: Registro de preços de dialisadores e equipos..."/></div>
+      <div class="fe" style="margin-bottom:8px;"><label>Comprador*</label>
+        <input id="rata-comp" placeholder="Nome do comprador"/></div>
+      <div class="fe" style="margin-bottom:8px;"><label>Resumo para nome da pasta*</label>
+        <input id="rata-res" placeholder="Ex: Renovação ATA 530 - Dialisadores"/>
+        <span class="hint">A pasta será criada como: (nº processo) - (resumo)</span></div>
+
+      <div class="mfsec" style="margin-top:12px;">
+        Itens para pesquisa de preços
+        <span style="font-size:10px;font-weight:400;color:var(--gray4);margin-left:6px;">(preenchidos pelo PDF ou adicione manualmente)</span>
+      </div>
+      <div id="rata-itens-lista" style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;"></div>
+      <div style="display:grid;grid-template-columns:60px 1fr 110px;gap:8px;align-items:end;">
+        <div class="fe"><label>Item</label><input id="rata-item-num" placeholder="1"/></div>
+        <div class="fe"><label>Descrição</label><input id="rata-item-desc" placeholder="Descrição do item"/></div>
+        <div class="fe"><label>CATMAT</label><input id="rata-item-catmat" placeholder="000000"/></div>
+      </div>
+      <button class="bgerar" style="margin-top:8px;width:100%;justify-content:center;" onclick="adicionarItemAta()">+ Adicionar item</button>
+
+    </div>
+    <div class="mftr">
+      <div class="mhint" id="rata-hint">Preencha os dados e adicione os itens</div>
+      <div class="macts">
+        <button class="bcancelar" onclick="fecharOv('ov-renovar-ata')">Cancelar</button>
+        <button class="bgerar" onclick="criarRenovacaoAta()">🔄 Criar Renovação</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Modal Processo em Andamento - Wizard -->
 <div class="overlay" id="ov-andamento" onclick="fecharOv('ov-andamento',event)">
   <div class="modal" onclick="event.stopPropagation()" style="max-width:560px;">
@@ -1305,7 +1372,160 @@ function unidadeClass(u) {
   if (lu.includes('clínicas') || lu.includes('clinicas')) return 'u-hc';
   return 'u-gen';
 }
+// ══════════ RENOVAÇÃO DE ATA ══════════
 
+
+function abrirModalRenovarAta() {
+  const ovEl = document.getElementById('ov-renovar-ata');
+  if (ovEl) ovEl.style.removeProperty('display');
+  _ataItens = [];
+    ['rata-proc','rata-int','rata-obj','rata-comp',
+   'rata-item-num','rata-item-desc','rata-item-catmat'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  // Preenche comprador logado
+  const elComp = document.getElementById('rata-comp');
+  if (elComp && compradorAtivo) elComp.value = compradorAtivo.nome || '';
+
+  document.getElementById('rata-pdf-status').textContent = '';
+  document.getElementById('rata-pdf-input').value = '';
+  _renderItensAta();
+  abrirOv('ov-renovar-ata');
+}
+
+function _renderItensAta() {
+  const lista = document.getElementById('rata-itens-lista');
+  if (!lista) return;
+  if (_ataItens.length === 0) {
+    lista.innerHTML = '<div style="font-size:12px;color:var(--gray4);padding:8px 0;">Nenhum item adicionado ainda.</div>';
+    return;
+  }
+  lista.innerHTML = _ataItens.map(function(it, i) {
+    return `<div style="display:flex;align-items:center;gap:6px;padding:6px 8px;
+                        background:var(--gray1);border-radius:6px;font-size:12px;">
+      <span style="font-family:monospace;min-width:28px;color:var(--gray4);">${it.item}</span>
+      <input value="${it.descricao || ''}" placeholder="Descrição do item"
+        onchange="_atualizarDescAta(${i}, this.value)"
+        style="flex:1;padding:4px 6px;border:1px solid var(--border);border-radius:4px;
+               font-size:11px;font-family:inherit;background:#fff;"/>
+      <span style="font-family:monospace;font-size:11px;color:var(--gray4);white-space:nowrap;">${it.catmat}</span>
+      <button onclick="_removerItemAta(${i})"
+        style="background:none;border:none;cursor:pointer;color:var(--red);font-size:13px;padding:0 4px;">✕</button>
+    </div>`;
+  }).join('');
+}
+function _atualizarDescAta(idx, valor) {
+  if (_ataItens[idx]) _ataItens[idx].descricao = valor;
+}
+function adicionarItemAta() {
+  const num    = (document.getElementById('rata-item-num')   || {}).value || '';
+  const desc   = (document.getElementById('rata-item-desc')  || {}).value || '';
+  const catmat = (document.getElementById('rata-item-catmat') || {}).value || '';
+  if (!catmat) { alert('Informe ao menos o CATMAT.'); return; }
+  _ataItens.push({ item: num, descricao: desc, catmat: catmat.replace(/\D/g,'') });
+  ['rata-item-num','rata-item-desc','rata-item-catmat'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  _renderItensAta();
+}
+
+function _removerItemAta(idx) {
+  _ataItens.splice(idx, 1);
+  _renderItensAta();
+}
+
+async function processarPdfAta(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('rata-pdf-status');
+  status.textContent = '⏳ Lendo PDF…';
+
+  try {
+    const base64 = await new Promise(function(res, rej) {
+      const r = new FileReader();
+      r.onload  = () => res(r.result.split(',')[1]);
+      r.onerror = () => rej(new Error('Falha ao ler arquivo'));
+      r.readAsDataURL(file);
+    });
+
+    const result = await gasCall('uploadPDF', {
+      pdfBase64: base64, nomeArquivo: file.name
+    });
+
+    const parsed = await gasCall('parsearAta', { idPdf: result.fileId });
+
+    if (parsed.objeto) {
+      const elObj = document.getElementById('rata-obj');
+      if (elObj && !elObj.value) elObj.value = parsed.objeto;
+    }
+
+    if (parsed.itens && parsed.itens.length > 0) {
+      parsed.itens.forEach(function(it) { _ataItens.push(it); });
+      _renderItensAta();
+      status.textContent = '✅ ' + parsed.itens.length + ' item(ns) extraído(s). Revise e complete as descrições.';
+    } else {
+      status.textContent = '⚠️ Nenhum CATMAT encontrado automaticamente. Adicione os itens manualmente.';
+    }
+  } catch(e) {
+    status.textContent = '❌ Erro ao processar PDF: ' + e.message;
+  }
+}
+
+async function criarRenovacaoAta() {
+  const numProc = (document.getElementById('rata-proc') || {}).value || '';
+  const inter   = (document.getElementById('rata-int')  || {}).value || '';
+  const obj     = (document.getElementById('rata-obj')  || {}).value || '';
+  const comp    = (document.getElementById('rata-comp') || {}).value || compradorAtivo.nome || '';
+
+  if (!numProc || !inter || !obj) {
+    alert('Preencha Nº Processo, Interessado e Objeto.');
+    return;
+  }
+  if (_ataItens.length === 0) {
+    alert('Adicione ao menos um item para a pesquisa de preços.');
+    return;
+  }
+
+  fecharOv('ov-renovar-ata');
+  mostrarLoading('Criando processo de renovação…');
+
+  try {
+    const compradorFolderId = compradorAtivo.pastaId || PASTA_PAI_ID;
+    const res = (document.getElementById('rata-res') || {}).value || numProc;
+    await gasCall('criarPasta', {
+      numProc, resumo: res, comprador: comp,
+      interessado: inter, assunto: obj,
+      compradorFolderId, tipo: 'RenovacaoAta'
+    });
+
+    const itensFormatados = _ataItens.map(function(it, i) {
+      return {
+        ITEM:       it.item || String(i + 1),
+        DESCRICAO:  it.descricao || '',
+        CATMAT:     it.catmat || '',
+        COD_UNICAMP:'',
+        VALOR:      '',
+        VALOR_HOMOLOG: '',
+        FORNECEDOR: ''
+      };
+    });
+    await gasCall('salvarItens', { numProc, itens: itensFormatados });
+
+    ocultarLoading();
+    await carregarDoSheets();
+    setTimeout(function() {
+      const cards = document.querySelectorAll('#pgrid .card');
+      if (cards.length) cards[cards.length - 1].scrollIntoView({ behavior:'smooth', block:'center' });
+    }, 100);
+    toast('✅', 'Renovação criada!', numProc + ' — ' + obj, true);
+
+  } catch(e) {
+    ocultarLoading();
+    toast('❌', 'Erro ao criar renovação', e.message, false);
+  }
+}
 // ══════════ NOVO PROCESSO ══════════
 function abrirModalNovoProcesso() {
   ['n-proc','n-int','n-obj','n-res'].forEach(id => {
@@ -1466,9 +1686,16 @@ function btn(ico, label, sub, tipo, onclick, dis) {
     <div class="btags"><span class="tag ${tc}">${tn}</span></div>
   </button>`;
 }
-
 function htmlFase1() {
-  const isSRP = dg().TIPO_CONTRATACAO !== 'Aquisicao';
+  const tipo  = dg().TIPO_CONTRATACAO;
+  console.log('TIPO_CONTRATACAO:', tipo); // remover após confirmar
+  const isSRP = tipo !== 'Aquisicao';
+
+  if (tipo === 'RenovacaoAta') return `
+  <div class="psec" style="margin-top:4px;">Renovação de Ata</div>
+  ${btn('🔍','Pesquisa de Preços (CATMAT)','Busca preços em dadosabertos.compras.gov.br','util','abrirPP()')}
+  ${btn('📧','Gerar Lista de E-mails para Cotação','Fornecedores SP filtrados por CATMAT','util',"toast('✉️','Em breve','Esta função será implementada em breve.')")}`;
+
   return `
   <div class="psec" style="margin-top:4px;">Pesquisa de Preços</div>
   ${btn('🔍','Pesquisa de Preços (CATMAT)','Busca preços em dadosabertos.compras.gov.br','util','abrirPP()')}
@@ -2122,6 +2349,10 @@ function abrirModal151() {
 }
 
 async function abrirPP() {
+  if (!procAtual || !procAtual.dadosGerais) {
+    toast('❌', 'Erro', 'Processo não carregado. Feche e abra o card novamente.', false);
+    return;
+  }
   const p = dg();
   document.getElementById('mpp-proc').textContent = p.PROCESSO + ' · ' + p.INTERESSADO;
   ppRascunho = {};
@@ -5485,6 +5716,7 @@ function _carregarPdfLib() {
         <button class="bgerar" onclick="gerarAF()">⚡ Gerar AF</button>
       </div>
     </div>
+  </div>
   </div>
 </div>
 </body>
