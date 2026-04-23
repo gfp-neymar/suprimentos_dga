@@ -878,6 +878,21 @@ body{background:var(--gray1);color:var(--dark);font-family:'Segoe UI',sans-serif
           </div>
         </div>
       </div>
+
+      <!-- PASSO 3: Confirmação com links de proposta -->
+      <div id="pp-passo3" style="display:none;">
+        <div style="background:#e8f4fd;border:1px solid #bbdefb;border-radius:8px;
+                    padding:10px 14px;margin-bottom:12px;font-size:12px;color:#1565c0;">
+          ℹ️ Confirme as contratações que serão enviadas à área técnica.
+          Acesse a proposta de cada fornecedor antes de confirmar.
+          Clique em <strong>✕</strong> para remover uma contratação da seleção.
+        </div>
+        <div id="pp-passo3-loading" style="display:none;text-align:center;padding:32px 0;
+             font-size:13px;color:var(--gray4);">
+          ⏳ Buscando links das propostas…
+        </div>
+        <div id="pp-passo3-container"></div>
+      </div>
  
     </div>
 <div class="mftr">
@@ -2356,21 +2371,38 @@ async function abrirPP() {
   }
   const p = dg();
   document.getElementById('mpp-proc').textContent = p.PROCESSO + ' · ' + p.INTERESSADO;
+ console.log('abrirPP chamada — zerando ppRascunho');
   ppRascunho = {};
 
+  ['pp-item','pp-desc','pp-catmat','pp-cod'].forEach(id => { document.getElementById(id).value = ''; });
+  abrirOv('ov-pp');
+
   try {
-    const r = await gasCall('carregarRascunhoPP', { numProc: p.PROCESSO });
-    if (r.ok && r.rascunho.length > 0) {
+const numProcStr = String(p.PROCESSO || '');
+console.log('Chamando carregarRascunhoPP com numProc:', numProcStr);
+const r = await gasCall('carregarRascunhoPP', { numProc: numProcStr });    console.log('carregarRascunhoPP retornou:', JSON.stringify(r.rascunho));    if (r.ok && r.rascunho.length > 0) {
       r.rascunho.forEach(function(entry) {
-        ppRascunho[String(entry.item)] = entry;
+        ppRascunho[String(entry.item)] = {
+          item:              entry.item,
+          descricao:         entry.descricao,
+          catmat:            entry.catmat,
+          selecionados:      entry.selecionados      || [],
+          itensSelecionados: entry.itensSelecionados || [],
+          cotacoesManuals:   entry.cotacoesManuals   || [],
+          dataPesquisa:      entry.dataPesquisa,
+          status:            entry.status
+        };
       });
     }
-  } catch(e) {}
-['pp-item','pp-desc','pp-catmat','pp-cod'].forEach(id => { document.getElementById(id).value = ''; });
-  abrirOv('ov-pp');
+  } catch(e) {
+    console.error('Erro ao carregar rascunho:', e);
+  }
+
   renderTabelaItensPP();
 }
   function renderTabelaItensPP() {
+  console.log('renderTabelaItensPP chamada | ppRascunho:', JSON.stringify(ppRascunho));
+  if (!procAtual || !procAtual.itens) return; // ignora chamadas fora de contexto
   const itens = procAtual.itens || [];
   if (itens.length === 0) {
     document.getElementById('mpp-itens').innerHTML = '<div style="color:var(--gray4);font-size:12px;padding:8px;">Nenhum item cadastrado.</div>';
@@ -2385,7 +2417,7 @@ async function abrirPP() {
     const r = ppRascunho[String(it.ITEM || '')];
     return r && r.status === 'PENDENTE';
   }).length;
-  const temSalvos = concluidos + comRascunho > 0;
+  const temSalvos = concluidos > 0;
 
 let html = `
   <div style="display:flex;justify-content:space-between;align-items:center;
@@ -2456,12 +2488,17 @@ const btnAcao = document.getElementById('pp-btn-acao');
   if (btnAcao) {
     if (temSalvos) {
       btnAcao.textContent   = '📊 Gerar planilha';
-      btnAcao.onclick       = confirmarGerarPP;
+      btnAcao.onclick       = abrirPasso3PP;
       btnAcao.style.display = '';
+      btnAcao.disabled      = false;
     } else {
       btnAcao.style.display = 'none';
+      btnAcao.disabled      = true;
     }
   }
+
+  // Log de diagnóstico — remover após confirmar
+  console.log('temSalvos:', temSalvos, '| concluidos:', concluidos, '| comRascunho:', comRascunho, '| btnAcao encontrado:', !!btnAcao);
 } // fecha renderTabelaItensPP
 
 function atualizarBtnExcluirPP() {
@@ -3305,6 +3342,7 @@ let ppSelecionados   = {};   // { catmat: Set de índices selecionados }
 let ppRascunho       = {};  // { itemNum: { selecionados, cotacoesManuals, status, dataPesquisa } }
 let ppItensMarcados  = [];  // itens marcados no passo 1 para pesquisar agora// ─── Extrai linkPNCP do pncpId caso venha vazio do backend ────
 let ppPaginacao      = {};  // { itemKey: { paginaAtual, totalPaginas, totalRegistros, catmat, itemNum, descItem } }
+let ppItensPasso3    = [];
 
 function _parsearLinkPNCP(pncpId) {
   if (!pncpId) return '';
@@ -3314,7 +3352,167 @@ function _parsearLinkPNCP(pncpId) {
     return 'https://pncp.gov.br/app/editais/' + partes[0] + '/' + partes[2] + '/' + parseInt(partes[1]);
   } catch(e) { return ''; }
 }
- 
+// ─── Passo 2 → 3: abre confirmação com links de proposta ──────
+async function abrirPasso3PP() {
+  // Consolida todos os itens selecionados dos rascunhos salvos
+  var itensSelecionados = [];
+  Object.keys(ppRascunho).forEach(function(itemNum) {
+    var rasc = ppRascunho[itemNum];
+    (rasc.itensSelecionados || []).forEach(function(it) {
+      itensSelecionados.push(it);
+    });
+  });
+
+  if (itensSelecionados.length === 0) {
+    toast('⚠️', 'Nenhum item selecionado', 'Conclua ao menos um item antes de gerar a planilha.', false);
+    return;
+  }
+
+  // Muda para passo 3
+  document.getElementById('pp-passo1').style.display  = 'none';
+  document.getElementById('pp-passo2').style.display  = 'none';
+  document.getElementById('pp-passo3').style.display  = '';
+  document.getElementById('pp-passo3-loading').style.display = '';
+  document.getElementById('pp-passo3-container').innerHTML   = '';
+
+  // Atualiza rodapé
+  const elHint     = document.getElementById('pp-mhint');
+  const elCancelar = document.getElementById('pp-btn-cancelar');
+  const elSalvar   = document.getElementById('pp-btn-salvar');
+  const elAcao     = document.getElementById('pp-btn-acao');
+  if (elHint)     elHint.textContent    = 'Confirme as contratações antes de gerar';
+  if (elSalvar)   elSalvar.style.display = 'none';
+  if (elCancelar) { elCancelar.textContent = '← Voltar'; elCancelar.onclick = voltarPasso1DePasso3; }
+  if (elAcao)     { elAcao.textContent = '📊 Gerar planilha'; elAcao.style.display = ''; elAcao.onclick = confirmarGerarPP; }
+
+  // Busca links das propostas no backend
+  try {
+    var pares = [];
+    var vistos = new Set();
+    itensSelecionados.forEach(function(it) {
+      var chave = (it.idCompra || '') + '||' + (it.fornecedor || '');
+      if (!vistos.has(chave) && it.idCompra) {
+        vistos.add(chave);
+        pares.push({ idCompra: it.idCompra, fornecedor: it.fornecedor || '' });
+      }
+    });
+
+    var r = await gasCall('buscarPropostas', { pares: pares });
+    var mapaLinks = r.links || {}; // { "idCompra||fornecedor": "url" }
+
+    // Guarda estado do passo 3 (pode ser editado pelo comprador)
+    ppItensPasso3 = itensSelecionados.map(function(it) {
+      var chave = (it.idCompra || '') + '||' + (it.fornecedor || '');
+      return Object.assign({}, it, { linkProposta: mapaLinks[chave] || '' });
+    });
+
+    document.getElementById('pp-passo3-loading').style.display = 'none';
+    _renderPasso3();
+
+  } catch(e) {
+    document.getElementById('pp-passo3-loading').style.display = 'none';
+    toast('❌', 'Erro ao buscar propostas', e.message, false);
+  }
+}
+
+// ─── Renderiza o passo 3 agrupado por CATMAT ─────────────────
+function _renderPasso3() {
+  var container = document.getElementById('pp-passo3-container');
+  if (!container) return;
+
+  if (ppItensPasso3.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:32px;color:var(--gray4);font-size:13px;">Nenhuma contratação selecionada.</div>';
+    const elAcao = document.getElementById('pp-btn-acao');
+    if (elAcao) elAcao.disabled = true;
+    return;
+  }
+
+  // Agrupa por CATMAT
+  var grupos  = {};
+  var ordem   = [];
+  ppItensPasso3.forEach(function(it, idx) {
+    var c = String(it.catmat || '');
+    if (!grupos[c]) { grupos[c] = []; ordem.push(c); }
+    grupos[c].push({ it: it, idx: idx });
+  });
+
+  var html = '';
+  ordem.forEach(function(catmat) {
+    var grupo = grupos[catmat];
+    html += '<div style="margin-bottom:20px;border:1px solid var(--border);border-radius:10px;overflow:hidden;">';
+    html += '<div style="background:#2B2B2B;color:#fff;padding:10px 14px;font-weight:700;font-size:13px;">'
+          + 'CATMAT: ' + catmat + ' &nbsp;·&nbsp; '
+          + '<span style="font-weight:400;font-size:11px;opacity:.7;">' + grupo.length + ' contratação(ões)</span>'
+          + '</div>';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+    html += '<thead><tr style="background:var(--gray1);">'
+          + '<th style="padding:7px 8px;border-bottom:1px solid var(--border);width:32px;"></th>'
+          + '<th style="padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);">Órgão</th>'
+          + '<th style="padding:7px 10px;text-align:left;border-bottom:1px solid var(--border);">Descrição</th>'
+          + '<th style="padding:7px 8px;text-align:right;border-bottom:1px solid var(--border);">Preço Unit.</th>'
+          + '<th style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--border);">Data</th>'
+          + '<th style="padding:7px 8px;text-align:center;border-bottom:1px solid var(--border);">Proposta</th>'
+          + '</tr></thead><tbody>';
+
+    grupo.forEach(function(entry) {
+      var it    = entry.it;
+      var idx   = entry.idx;
+      var preco = parseFloat(it.preco || 0).toLocaleString('pt-BR', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+var linkCnetHtml = it.linkComprasNet
+  ? '<a href="' + it.linkComprasNet + '" target="_blank" '
+    + 'style="color:var(--blue);text-decoration:none;font-weight:600;margin-right:8px;">🛒 Item</a>'
+  : '';
+var linkPropostaHtml = it.linkProposta
+  ? '<a href="' + it.linkProposta + '" target="_blank" '
+    + 'style="color:var(--blue);text-decoration:none;font-weight:600;">📋 Proposta</a>'
+  : '<span style="color:var(--gray4);font-size:11px;">—</span>';
+var linksHtml = linkCnetHtml + linkPropostaHtml;
+      html += '<tr>'
+            + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;">'
+            + '<button onclick="ppRemoverPasso3(' + idx + ')" '
+            + 'style="background:none;border:none;cursor:pointer;color:var(--red);font-size:15px;'
+            + 'font-weight:700;padding:0 4px;" title="Remover desta seleção">✕</button></td>'
+            + '<td style="padding:6px 10px;border-bottom:1px solid var(--border);max-width:140px;'
+            + 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + (it.orgao || '') + '">'
+            + (it.orgao || '').substring(0, 30) + '</td>'
+            + '<td style="padding:6px 10px;border-bottom:1px solid var(--border);max-width:220px;'
+            + 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + (it.descricao || '') + '">'
+            + (it.descricao || '').substring(0, 50) + '</td>'
+            + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:right;'
+            + 'font-family:monospace;font-weight:700;">R$ ' + preco + '</td>'
+            + '<td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;'
+            + 'font-family:monospace;font-size:11px;">' + (it.data || '').substring(0, 10) + '</td>'
++ '<td style="padding:6px 8px;border-bottom:1px solid var(--border);text-align:center;">'
++ linksHtml + '</td>'
+            + '</tr>';
+    });
+
+    html += '</tbody></table></div>';
+  });
+
+  container.innerHTML = html;
+  const elAcao = document.getElementById('pp-btn-acao');
+  if (elAcao) elAcao.disabled = false;
+}
+
+// ─── Remove um item do passo 3 ────────────────────────────────
+function ppRemoverPasso3(idx) {
+  ppItensPasso3.splice(idx, 1);
+  _renderPasso3();
+}
+
+// ─── Volta do passo 3 para o passo 1 ─────────────────────────
+function voltarPasso1DePasso3() {
+  document.getElementById('pp-passo3').style.display = 'none';
+  document.getElementById('pp-passo1').style.display = '';
+
+  const elCancelar = document.getElementById('pp-btn-cancelar');
+  const elAcao     = document.getElementById('pp-btn-acao');
+  const elHint     = document.getElementById('pp-mhint');
+  if (elCancelar) { elCancelar.textContent = 'Cancelar'; elCancelar.onclick = () => fecharOv('ov-pp'); }
+  if (elHint)     elHint.textContent = 'Busca em dadosabertos.compras.gov.br';
+  renderTabelaItensPP();
+} 
 // ─── Passo 1→2: busca resultados e renderiza curadoria ────────
 async function previewPP() {
   // Mantida por compatibilidade — o novo fluxo usa editarItemPP por item
@@ -3825,23 +4023,34 @@ function ppRemoverManual(catmat, idx, elDiv) {
  
 // ─── Volta ao passo 1 ─────────────────────────────────────────
 function voltarConfigPP() {
-  document.getElementById('pp-passo1').style.display  = '';
-  document.getElementById('pp-passo2').style.display  = 'none';
-  document.getElementById('pp-btn-salvar').style.display = 'none';
-  document.getElementById('pp-mhint').textContent     = 'Busca em dadosabertos.compras.gov.br';
-
+  try {
+  const elPasso1  = document.getElementById('pp-passo1');
+  const elPasso2  = document.getElementById('pp-passo2');
+  const elPasso3  = document.getElementById('pp-passo3');
+  const elSalvar  = document.getElementById('pp-btn-salvar');
+  const elHint    = document.getElementById('pp-mhint');
   const btnCancelar = document.getElementById('pp-btn-cancelar');
-  btnCancelar.textContent = 'Cancelar';
-  btnCancelar.onclick     = () => fecharOv('ov-pp');
+
+  if (elPasso1)   elPasso1.style.display  = '';
+  if (elPasso2)   elPasso2.style.display  = 'none';
+  if (elPasso3)   elPasso3.style.display  = 'none';
+  if (elSalvar)   elSalvar.style.display  = 'none';
+  if (elHint)     elHint.textContent      = 'Busca em dadosabertos.compras.gov.br';
+  if (btnCancelar) {
+    btnCancelar.textContent = 'Cancelar';
+    btnCancelar.onclick     = () => fecharOv('ov-pp');
+  }
 
   ppItensPreview   = [];
   ppCotacoesManual = {};
   ppSelecionados   = {};
   ppItensMarcados  = [];
 
-  renderTabelaItensPP(); // já atualiza o pp-btn-acao internamente
-}
- 
+  renderTabelaItensPP();
+  } catch(err) {
+    console.error('ERRO em voltarConfigPP:', err);
+  }
+} 
 // ─── Confirma e gera planilha ─────────────────────────────────
 async function confirmarGerarPP() {
   fecharOv('ov-pp');
